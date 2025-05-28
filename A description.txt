@@ -1,0 +1,79 @@
+A description of the problem:
+
+The program will comprise of two main parts. The first will be a black box which takes in an input board position with either black or white to move and outputs the single best move in that position along with the evaluated position score e.g. +3 or -4.3. This section will be primarily written in C++ however this is subject to change as our language acquisition of C++ at this moment is quite minimal. Hoping to push the engine anywhere between 1800 - 2500 elo.
+
+The second will be GUI displaying a chess board that a user can play on similar to chess.com. However, there is only one game mode Player vs Computer (i.e. the computer we have developed). The program should allow the user to make a legal move and continually request our designed computer for the best move and play it. This will primarily be developed in python.
+
+Main Challenges Associated With Engine:
+
+(1) Implementing an efficient evaluation function, this includes but is not limited to:
+   - Counting material costs e.g. queen = 9, pawn = 1
+   - Transposition tables e.g. knights on the edge of the board will bring the evaluation down, piece play towards centre brings eval up
+   - King safety e.g. moving pawns in front of the king is not favourable  
+   - Look up tables e.g. previously explored postions are easier to look up then calculate from scratch 
+This is all available on different chess forums as these have been extensively researched by someone else all we need to do is to implement this in an effective way to suit our needs.
+
+(2) We need to implement a minimax algorithm with alpha beta pruning this will be the backbone of the search. If any of this is unclear please consult further reading 
+
+(3) An efficient way to represent our boards have looked into bitboards but still unsure about how to represent the pieces either as class or some other data structure. Unsure about how to get the computer to understand what a "Queen" is and what a "Queen" does in terms of the bitboards, Needs further research
+
+(4) Engine will have to read in standard format for submitting chess positions I think its called a PGN board. This should be read in as the input to the engine.
+
+Have found that C++ has an extensive chess library which may be of some use.
+
+
+
+Main Challenges Associated with the GUI:
+
+(1) Very concerned about duplicating code that is used in the engine for legal move generation here if that were to happen then whats the point of using C++.
+
+(2) Legal move generation
+
+(3) Building a functioning and tolerable GUI. No need to implement clocks or anything like game only ends by draw, checkmate or resignation. (Implementing draws are going to be a pain).
+
+(4) Moves made by the engine are made in a tolerable amount of time roughly 5-7s at a push.
+
+
+
+
+As always this is the first general description of the problem so we are on the same page of what it means to have completed the project. This is subject to change as the project progresses through but for now this will be the what we refer to.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://www.chessprogramming.org/Evaluation

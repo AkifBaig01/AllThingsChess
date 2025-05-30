@@ -1,2 +1,2 @@
-# AllThingsChess
+# AllThingsChest
 Chess GUI and Engine

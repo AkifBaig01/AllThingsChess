@@ -1,0 +1,75 @@
+In this document I will attempt to specify the actions we need to take to greater detail to achieve a working project. For now this will only contain detail on the engine and leave out the GUI for later as I assume that will be the easier of the two.
+
+Each step will most likely be around 200 - 250 lines of code. Throughout all of our development we will try and make use of object oriented programming as much as possible. C++ uses classes a bit differently to python so definitely should have a refresh of how to program this for C++. You have two main types structs and classes.
+
+It is statically typed we have to be very careful about return types. For example I was programming an Arduino board once in C++ and 17/19 returned 0 wasted 2 hours debugging that the current way to do it was 17.0/19.0 so the division returns type float not type int.
+
+Steps to be carried out:
+As previously mentioned each of these should be contained within one file linked to a header file and called throughout the whole program like that. If unsure of what this means please read up on it. 
+
+(1) Bitboard
+What is it and why?
+Lucky for us chess has 64 board squares, that means we can represent the entire board in a single string of bits i.e. 10101010000... up to 64 bits. Since modern computers use a 64 bit architecture these days, we can process the entire board in a single instructions vs using arrays which use multiple instruction to represent the boards. A disadvantage to this is that it makes it very abstract dealing with along sequence of bits doing moves like pawn to d4 become a bit harder to implement but there are algorithms which handle this to change the particular bit. Another disadvantage is that each bit board on its own is pretty useless as it can only store 1 or 0 so we need to make use of multiple to represent one board e.g. one whole string of 64 bits to represent white pawn positions then black pawn positions hold them in an array to represent the board and start manipulating them. Make yourself extremely familiar with bitwise operations like the bitwise xor bitwise and. E.g. if there is white pawn trying to move forward and there is knight there the bitwise xor for 1 and 1 returns 0 so we can process legal moves in about a 100 instructions for a normal positions should be extremely fast vs the array implementation if we add in look up tables we cut that down to 50 instructions but lets not worry about that now. 
+
+First we should get the starting chess positions setup with 12 bitboards held in an array to represent the starting position. An example would be call a function to say update white pawn position on h2 and outputs the updated board then we call it 8 times for all the white pawns then for all the black pawns. The reason for this will become clear later.
+
+We need to have a way of reading standard board representation terminology. There is PGN or some other ones that I don't remember. But the point is the input to this program will be some form of a PGN and the output will be the completed bit board since this will be a black box in a way when we move onto the next step all we need to do is to get the board out and start manipulating it without worrying about board generation. We will try and modularise the program as much as possible. Just did some research we should use FEN representation to represent a chess position. In total we will need 12 bitboards and 6 flags White queen and king side castling rights black queen and king side castling enpassant check and whos turn is it to move.
+
+We will try and finish this relatively quickly.
+
+Helpful links and videos:
+
+Video series on bitboards and the problems of move generation this is video 14 in the series:
+
+https://youtu.be/pEPEWXiAqZs?si=XCBRALEsK7RjU-kF
+
+This is a great video which gives a great overview of the whole problem:
+
+https://youtu.be/w4FFX_otR-4?si=n80YanFXkmC-ccyA
+
+This goes into the specific implementation in C++ for bitboards:
+
+https://youtu.be/yq6Qn3IoqEA?si=FhPAUZNlOpNDjx-d
+
+An insight into bitwise operations:
+
+https://youtu.be/igIjGxF2J-w?si=emJYGT1crK7Lmdjy
+
+Apparently this guy is really good don't know why haven't watched his videos its an hour long but you can this is video 2 in the series:
+
+https://youtu.be/_vqlIPDR2TU?si=Rmz30xC69XRKWKhI
+
+We will return to the other steps later probably a better idea as we will have a better idea of the project but they are listed below for greater clarity.
+
+(2) Move generation
+
+
+(3) Evaluation Function 
+
+
+(4) Minimax or Monte Carlo search can decide when we come to this 
+
+
+(5) Pruning and extensive search optimisation 
+
+(6) Even more optimisation in the eval function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

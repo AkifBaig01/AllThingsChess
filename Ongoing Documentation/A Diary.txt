@@ -1,0 +1,17 @@
+Purpose of this is to make notes so I don't forget what I need to remember to do for the next time feel free to add.
+
+04/06/25
+Had a look at Stockfish code and safe to say quite a lot to do. As part of the bitboard function we have to create:
+
+(1) FEN (Forsyth-Edwards notation) parser to represent any position. Conveniently, on stockfish GitHub there's a file called benchmark.cpp which we can use to test our engine to make sure it is working as expected with expected mating nets and things like that all covered.
+
+(2) Read these parsers in and generate the 12 bitboards store them inside a struct which I have defined int he header file.
+
+(3) This is the way stockfish does it and we should probably do the same. On startup it generates every single pieces attack table we will probably do the same which will be hard but not too bad.
+
+Steps:
+
+Starting Position ----->  Helper functions -----> Main function with struct generation -----> FEN parser  ***** First Major Goal *****
+
+----->  On startup generate attack tables
+

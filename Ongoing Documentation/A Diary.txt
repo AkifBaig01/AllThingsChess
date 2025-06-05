@@ -15,3 +15,9 @@ Starting Position ----->  Helper functions -----> Main function with struct gene
 
 ----->  On startup generate attack tables
 
+05/06/25
+
+This is going to be a a lot harder than I thought it would be. Need to create a Cmake file which tells the compiler what files I want it to compile and link unsure on how to actually go about doing this but I will hopefully get round to doing this tomorrow.
+
+Today 
+

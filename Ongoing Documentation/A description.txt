@@ -39,41 +39,8 @@ Main Challenges Associated with the GUI:
 As always this is the first general description of the problem so we are on the same page of what it means to have completed the project. This is subject to change as the project progresses through but for now this will be the what we refer to.
 
 
+Helpful Links:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+https://en.wikipedia.org/wiki/Computer_chess
 
 https://www.chessprogramming.org/Evaluation

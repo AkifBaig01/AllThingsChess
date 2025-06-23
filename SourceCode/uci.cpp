@@ -9,7 +9,10 @@
 /*
 Will be the function to send requests and recieve requests from the uci for now it will only be
 concerned with the parsing of the fen string UCI tell and so on functions will be implemented later
-as it should be realtively easy.
+as it should be relatively easy.
+
+Just to be clear for now this should just take a fen string and return some
+representation of the board e.g. black knights on g5 and b4...
 */
 
 std::string generate_random_board() {
@@ -24,20 +27,12 @@ std::string generate_random_board() {
 
 uint64_t fen_parsed() {
     std::string test_board = generate_random_board();
-    std::cout << "String to convert " << test_board << "\n";
 
     std::string value = test_board;
     uint64_t a;
     char* end;
     a= strtoull( value.c_str(), &end, 2);
     std::bitset<64> bits_of_a(a);
-    std::cout << "As uint64_t (binary):  " << bits_of_a.to_string() << "\n";
-    // std::cout << "UInt64: " << a << "\n";
 
     return a;
-}
-
-int main() {
-    fen_parsed();
-    return 0;
 }

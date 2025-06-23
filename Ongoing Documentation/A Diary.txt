@@ -19,5 +19,15 @@ Starting Position ----->  Helper functions -----> Main function with struct gene
 
 This is going to be a a lot harder than I thought it would be. Need to create a Cmake file which tells the compiler what files I want it to compile and link unsure on how to actually go about doing this but I will hopefully get round to doing this tomorrow.
 
-Today 
+25/06/25
+
+Have not updated this in quite a while and need to look back over past work. Fixed the cmake problem. Installed it an added it to path, installed the cmake extension on vscode. The Microsoft video on it is quite helpful and is the only reason it works. Created a CmakeLists.txt file and added my executables to it and created a presets.json file. Seems to be working fine now all I need to do is to click the side panel mess about with the builds and .exe files and tell it execute all done in the bottom left hand bar.
+
+Look back over past work and ill update this when I get a chance.
+
+Today spent around an hour and half watching chess programming's videos. Off to a great start following him simple easy understand pretty much everything. Needed some inspiration or a good start. 
+
+Helper print functions, macros e.g set get and pop bits were all built and tested. An Enum for square pieces was also created and this helps a lot I can see the early forms of abstraction happening.
+
+Tomorrows tasks are to find a way through some more research of how to transport a fen string into the bitboard and start generating the bitboards and storing it in a struct. Shouldn't be overly complicated.
 

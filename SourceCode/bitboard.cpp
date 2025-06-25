@@ -44,6 +44,39 @@ To be used later...
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 */
 
+// enums to represent arrays used in structs more cleanly
+
+enum {
+    white_pawns, white_knights, white_bishops, white_rooks, white_queens, white_king,
+    black_pawns, black_knights, black_bishops, black_rooks, black_queens, black_king,
+    piece_no
+};
+
+enum {
+    white_pieces, black_pieces, both_pieces,
+    both_no
+};
+
+// Struct to represent the full state of the game
+
+struct full_pos {
+    uint64_t bitboard[piece_no];  // 6 piece types 2 colours
+    uint64_t occupancies[both_no];  // white, black and both
+
+    // Castling rights explicitly deifned 
+    bool white_king_side_castle = true;
+    bool white_queen_side_castle = true;
+    bool black_king_side_castle = true;
+    bool black_queen_side_castle = true;
+    
+    int enpassant_square = -1;  // -1 if not availible otherwise square index
+    int half_move_clock = 0; // keep track of the 50 move rule 
+    int full_move_clock = 1; // full move numbers incremented after black to move
+
+    int to_move = 1; // 1 - white to move, 0 - black to move
+};
+
+
 
 /*
 ================================================
@@ -111,3 +144,13 @@ int main(){
 
 // TODO: Some tests firts, start wrting specific bitboards e.g white pawns
 // Even defining the struct is useful at this stage
+
+
+/*
+Plan is to parse the fen string in a sperate file 
+and pass a struct into here with everything ready to be made and using that struct 
+update the relevant board pieces 
+
+This will be done in the uci function a struct basically looks like the same one i used 
+here in the bitboard.cpp file 
+*/

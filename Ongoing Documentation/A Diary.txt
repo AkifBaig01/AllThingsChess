@@ -19,7 +19,7 @@ Starting Position ----->  Helper functions -----> Main function with struct gene
 
 This is going to be a a lot harder than I thought it would be. Need to create a Cmake file which tells the compiler what files I want it to compile and link unsure on how to actually go about doing this but I will hopefully get round to doing this tomorrow.
 
-25/06/25
+23/06/25
 
 Have not updated this in quite a while and need to look back over past work. Fixed the cmake problem. Installed it an added it to path, installed the cmake extension on vscode. The Microsoft video on it is quite helpful and is the only reason it works. Created a CmakeLists.txt file and added my executables to it and created a presets.json file. Seems to be working fine now all I need to do is to click the side panel mess about with the builds and .exe files and tell it execute all done in the bottom left hand bar.
 
@@ -30,4 +30,15 @@ Today spent around an hour and half watching chess programming's videos. Off to 
 Helper print functions, macros e.g set get and pop bits were all built and tested. An Enum for square pieces was also created and this helps a lot I can see the early forms of abstraction happening.
 
 Tomorrows tasks are to find a way through some more research of how to transport a fen string into the bitboard and start generating the bitboards and storing it in a struct. Shouldn't be overly complicated.
+
+24/06/25
+
+Updated the structs and enums in bitboard.cpp the challenge now is to parse the fen string into struct defined within the uci function and pass that onto bitboard to the turn into a real position representation. Using this like switch and case statements which is like the jump tables used in assembly. used enums to parse the square index int array in the fen struct and that is the found dation. still haven't given the castling stuff much thought or how to dela with fen + pgn but that's laters problem lets get the square index and the code reading nicely.
+
+
+25/06/25
+
+Started parsing the fen string works as intended for the first segment. Only works for the first part of the board postiton of the fen string but the other parts do not work as of yet. I think tomorrow I will just need to go through it tidy it up and add some comment sot make it more readeable good documentation then move ont to fully initialising fen_rep after that I should be done. Well after that I will have to deal with edge cases with the fne plus the PGN but well see what happens. For now this is the plan:
+
+Clean Up ----> Fully initialise ----> PGN implementation  -----> Edge Cases in PGN  ----> Bitboard Build
 

@@ -42,3 +42,12 @@ Started parsing the fen string works as intended for the first segment. Only wor
 
 Clean Up ----> Fully initialise ----> PGN implementation  -----> Edge Cases in PGN  ----> Bitboard Build
 
+
+01/07/25
+
+Made a lot of changes since the last update. almost finished parsing the fen string up completely. Need to build a move parser then the whole thing is complete first major milestone. Run some perft testing and after it has passed all of that make the code clean. clean up multiple declarations package everything up and make the whole initialisation process as simple as calling one function. After that I will move over used functions into a utils file and call that to make it ultra clean. Only then after everything is modular commented and up to standard I will move onto bitboard file. All in all by the end of this week I think everything should be done for both the files.
+
+fen ----> bitboards -----> attack tables ----> move gen -----> evaluate ------> search -------> output
+
+all in all I think a simple working prototype should be nearing completion by the end of this month.
+

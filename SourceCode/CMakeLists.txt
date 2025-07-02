@@ -8,6 +8,8 @@ enable_testing()
 add_executable(MyChessEngine
     bitboard.cpp
     uci.cpp
+    utils.cpp
+    main.cpp
 )
 
 # If you have headers, and want to include them globally

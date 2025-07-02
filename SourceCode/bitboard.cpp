@@ -1,5 +1,6 @@
 #include "bitboard.h"
 #include "uci.h"
+#include "utils.h"
 
 #include <cstdint>
 #include <iostream>
@@ -17,45 +18,6 @@
 // If get bit returns true then do Bitwise XOR else return 0
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1Ull << square) : 0)
 
-
-// board sqaures
-// generates constant numbers for each sqaure value e.g. e4 = 30
-enum {
-    a8, b8, c8, d8, e8, f8, g8, h8,
-    a7, b7, c7, d7, e7, f7, g7, h7,
-    a6, b6, c6, d6, e6, f6, g6, h6,
-    a5, b5, c5, d5, e5, f5, g5, h5,
-    a4, b4, c4, d4, e4, f4, g4, h4,
-    a3, b3, c3, d3, e3, f3, g3, h3,
-    a2, b2, c2, d2, e2, f2, g2, h2,
-    a1, b1, c1, d1, e1, f1, g1, h1
-};
-
-/*
-To be used later...
-
-"a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
-"a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7"
-"a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6"
-"a5", "b5", "c5", "d5", "e5", "f5", "g5", "h5"
-"a4", "b4", "c4", "d4", "e4", "f4", "g4", "h4"
-"a3", "b3", "c3", "d3", "e3", "f3", "g3", "h3"
-"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"
-"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
-*/
-
-// enums to represent arrays used in structs more cleanly
-
-enum {
-    white_pawns, white_knights, white_bishops, white_rooks, white_queens, white_king,
-    black_pawns, black_knights, black_bishops, black_rooks, black_queens, black_king,
-    piece_no
-};
-
-enum {
-    white_pieces, black_pieces, both_pieces,
-    both_no
-};
 
 // Struct to represent the full state of the game
 
@@ -117,6 +79,7 @@ HELPER PRINT END
 =================================================
 */
 
+/*
 int main(){
     // defining bitboard
     uint64_t bitboard = 0ULL;
@@ -141,6 +104,8 @@ int main(){
     print_bitboard(bitboard);
   
 }
+
+*/
 
 // TODO: Some tests firts, start wrting specific bitboards e.g white pawns
 // Even defining the struct is useful at this stage

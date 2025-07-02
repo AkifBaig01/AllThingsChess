@@ -1,3 +1,5 @@
+#include <utils.h>
+
 #include <cstdint>
 #include <string>
 #include <cstdlib>
@@ -10,17 +12,8 @@
 
 // ALL DECLARATIONS
 
-// For piece case tables and indexing for array, provides constant values 
-enum {
-    white_pawns, white_knights, white_bishops, white_rooks, white_queens, white_king,
-    black_pawns, black_knights, black_bishops, black_rooks, black_queens, black_king,
-    empty = -1, piece_no
-};
-
-// Could consider moving these into a utils file 
-
 // Represents the full fen string in a board representation
- struct fen_rep {
+struct fen_rep {
 
     int squares[64];  // hold the values for board sqaures occupied and by what piece
 
@@ -34,12 +27,12 @@ enum {
     int half_move_clock = 0; // keep track of the 50 move rule 
     int full_move_clock = 1; // full move numbers incremented after black to move
 
-    int to_move = 1; // 1 - white to move, 0 - black to move
+    int to_move = 1; // 1 if white to move, 0 if black to move
 
     fen_rep() {
         std::fill(squares, squares + 64, empty);
     }
- };
+};
 
 
 // Return piece calues based on enum declartions
@@ -68,33 +61,6 @@ int get_piece_enum(char c) {
     }
 }
 
-
-// Splitting the fen up and storing it in a dynamic array
-// Spits string by a given delimiter
-std::vector<std::string> split(const std::string& lines, char delim = ' '){
-
-    // Intialise vector object each elt stored as string 
-    std::vector<std::string> items;
-
-    // Convert string to stream object to get accesss to processing tools 
-    std::istringstream school(lines);
-
-    // Intialise string variable 
-    std::string token;
-
-    // Goes through the given stream object returns true if char availible untill
-    // Next delim or false if not stores chars in token and returns that
-    // get line requires stream object not stirng 
-    while (std::getline(school, token, delim)) {
-
-        // Add to dynamaic array 
-        items.push_back(token);
-    }
-
-
-    // Return dynamic array
-    return items;
-}
 
 void helper_print(fen_rep& parsed) {
         for (int rank = 0; rank <8; rank++) {
@@ -132,15 +98,6 @@ void helper_print(fen_rep& parsed) {
     std::cout << "This is for fullmove clock " << parsed.full_move_clock  << "\n";
 
 
-}
-
-int sqaure_to_index(const std::string& square) {
-    int file = square[0] - 'a';
-    int rank = '8' - square[1];
-
-    std::cout << rank * 8 + file << '\n';
-
-    return rank * 8 + file;
 }
 
 // ALL DECLARATIONS
@@ -188,10 +145,10 @@ fen_rep board_pos(fen_rep& parsed, std::string fen) {
 
 fen_rep to_move(fen_rep& parsed, std::string turn_move) {
     if (turn_move == "w") {
-        parsed.to_move = 1;
+        parsed.to_move = white;
     }
     else
-        parsed.to_move = 0;
+        parsed.to_move = black;
 
     return parsed;
 }
@@ -200,8 +157,10 @@ fen_rep enpassant(fen_rep& parsed, std::string enpassant_square) {
     if (enpassant_square == "-") {
         parsed.enpassant_square = -1;
     }
-    else
-        parsed.enpassant_square = 25;
+    else {
+        int current_enpssant_sqaure = sqaure_to_index(enpassant_square);
+        parsed.enpassant_square = current_enpssant_sqaure;
+    }
     
     return parsed;
 }
@@ -249,12 +208,14 @@ fen_rep more_moves (fen_rep& parsed, std::vector<std::string> moremoves) {
 }
 
 
-fen_rep fen_parser(std::vector<std::string> fen_array) {
+// add in split purely one function call MORE CONSCISE
+fen_rep fen_parser(std::string fen_string) {
     fen_rep board;
+    std::vector<std::string> fen_array = split(fen_string);
     // Main parser call other helper function 
     // Aim is to call this one fucntion to setup the final strcut to be passed onto bitbaord.cpp
     // Want to call the list of functions in an array like python would make this alot cleaer and nicer
-    if (fen_array.size() == 6) {
+    if (fen_array.size() <= 6) {
         board = board_pos(board, fen_array[0]);
         board = to_move(board, fen_array[1]);
         board = castling(board, fen_array[2]);
@@ -263,7 +224,7 @@ fen_rep fen_parser(std::vector<std::string> fen_array) {
         board = full_moves(board, fen_array[5]);
     }
 
-    else
+    else {
         board = board_pos(board, fen_array[0]);
         board = to_move(board, fen_array[1]);
         board = castling(board, fen_array[2]);
@@ -275,7 +236,8 @@ fen_rep fen_parser(std::vector<std::string> fen_array) {
             std::cout << move << '\n';
         }
         board = more_moves(board, moves);
-
+    }
+    
     return board;
 }
 
@@ -293,18 +255,17 @@ fen_rep fen_parser(std::vector<std::string> fen_array) {
 
 
 
-
+/*
 int main() {
     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 b8c6 f1b5";
-    std::vector<std::string> fen_array = split(fen);
 
-    fen_rep board = fen_parser(fen_array);
+    fen_rep board = fen_parser(fen);
 
     helper_print(board);
 
     return 0;
 }
-
+*/
 
 // Final representation is almost done
 /*

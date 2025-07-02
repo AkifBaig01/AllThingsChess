@@ -136,7 +136,9 @@ void helper_print(fen_rep& parsed) {
 
 int sqaure_to_index(const std::string& square) {
     int file = square[0] - 'a';
-    int rank = square[1] - '1';
+    int rank = '8' - square[1];
+
+    std::cout << rank * 8 + file << '\n';
 
     return rank * 8 + file;
 }
@@ -233,11 +235,19 @@ fen_rep full_moves (fen_rep& parsed, std::string fullmoves) {
     return parsed;
 }
 
-/*
+
 fen_rep more_moves (fen_rep& parsed, std::vector<std::string> moremoves) {
-    // Ill do later 
+    std::cout << "I have ran \n";
+    for (std::string move : moremoves) {
+        int from = sqaure_to_index(move.substr(0,2));
+        int temp = parsed.squares[from];
+        parsed.squares[from] = empty;
+        int to = sqaure_to_index(move.substr(2,2));
+        parsed.squares[to] = temp;
+    }
+    return parsed; 
 }
-*/
+
 
 fen_rep fen_parser(std::vector<std::string> fen_array) {
     fen_rep board;
@@ -254,7 +264,17 @@ fen_rep fen_parser(std::vector<std::string> fen_array) {
     }
 
     else
-        std::cout << "Make sure to add other functins here to it that deals with the addtional moves";
+        board = board_pos(board, fen_array[0]);
+        board = to_move(board, fen_array[1]);
+        board = castling(board, fen_array[2]);
+        board = enpassant(board, fen_array[3]);
+        board = half_move(board, fen_array[4]);
+        board = full_moves(board, fen_array[5]);
+        std::vector<std::string> moves(fen_array.begin() + 7, fen_array.end());
+        for (std::string move : moves) {
+            std::cout << move << '\n';
+        }
+        board = more_moves(board, moves);
 
     return board;
 }
@@ -275,7 +295,7 @@ fen_rep fen_parser(std::vector<std::string> fen_array) {
 
 
 int main() {
-    std::string fen = "r3k2r/pppq1ppp/2n2n2/2bp4/3P4/2N1PN2/PPP2PPP/R1BQ1RK1 b - - 5 12";
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 b8c6 f1b5";
     std::vector<std::string> fen_array = split(fen);
 
     fen_rep board = fen_parser(fen_array);
@@ -286,6 +306,14 @@ int main() {
 }
 
 
-// 0 - Board pos, 1 - to move, 2 - castling if none -, enpassant sqaures if none -, 50 move rule, full moves availible 
-// Goal is to make one function to setup the postion and pass it onto the bitboard file to finally build
-// Final Representation
+// Final representation is almost done
+/*
+LIMITATIONS:
+A partial move gen has been added but does NOT update state accurately
+Only the use of the position fen strign along with board elemnts is considered functional
+Move gen and legal move checking will be added later I fear it is outside the scope of this file 
+and its respnsibilities
+
+next steps are to refactor simplify comment and integrate this file with the rest of the engine
+
+*/

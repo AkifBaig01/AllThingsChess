@@ -31,12 +31,10 @@ std::vector<std::string> split(const std::string& lines, char delim){
     // get line requires stream object not stirng 
     while (std::getline(school, token, delim)) {
 
-        std::cout << "I am running" << std::endl;
         // Add to dynamaic array 
         items.push_back(token);
     }
 
-    std::cout << "I have finshed running" << std::endl;
     // Return dynamic array
     return items;
 }

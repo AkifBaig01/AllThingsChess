@@ -6,11 +6,28 @@
 
 
 int main() {
-    std::string fen = "8/5k2/8/5Pp1/8/6K1/8/8 b - f3 12 63";
+    std::string fen = "8/P7/8/8/8/8/8/k6K b - - 0 1";
 
     fen_rep board = fen_parser(fen);
 
-    helper_print(board);
+    full_pos represent = set_bitboard_pos(board);
+
+    for (int i = 0; i < piece_no; i++){
+        print_bitboard(represent.bitboard[i]);
+    }
+
+    std::cout << represent.white_king_side_castle << '\n';
+    std::cout << represent.white_queen_side_castle << '\n';
+    std::cout << represent.black_king_side_castle << '\n';
+    std::cout << represent.black_queen_side_castle << '\n';
+
+    std::cout << represent.enpassant_square << '\n';
+
+    std::cout << represent.half_move_clock<< '\n';
+
+    std::cout << represent.full_move_clock << '\n';
+
+    std::cout << represent.to_move << '\n';
 
     return 0;
 }

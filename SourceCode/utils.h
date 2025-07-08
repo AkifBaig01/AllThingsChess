@@ -49,7 +49,7 @@ enum {
 enum {
     white_pawns, white_knights, white_bishops, white_rooks, white_queens, white_king,
     black_pawns, black_knights, black_bishops, black_rooks, black_queens, black_king,
-    empty = -1, piece_no
+    piece_no, empty = -1
 };
 
 // Great for side to move indexing

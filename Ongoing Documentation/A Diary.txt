@@ -51,3 +51,26 @@ fen ----> bitboards -----> attack tables ----> move gen -----> evaluate ------> 
 
 all in all I think a simple working prototype should be nearing completion by the end of this month.
 
+02/07/25
+
+Very excited. Refactor seemed to have worked with minimal problems. Had a problem with vector size being too large this was due to me not including curly braces in the else clause so code kept accessing garbage values. Cpp not including an IndexError has to be one of the biggest draw backs of using this language but I am getting use to it. Plan is to keep pushing on clean up code run some tests on it if all goes well we will tackle the bitboard init stuff. But a milestone today fen string is parsed and is currently accurately representing board state. 
+
+Move onto bitboards should take a couple of days. Maybe I will refactor my macros into solid inline functions but we will see how it goes.
+
+08/07/25
+
+I was working for the last few days so couldn't find as much time to work on this as I wanted to. Despite that, the bitboard works fine parsing fen strings without moves perfectly. That is stage 2 finished very happy. Next steps are to build various attack tables. After that creating a move gen function. This will have to deal with all the nuances of chess promotions, enpassant, checkmates and should be the biggest file yet of the project. Before I even attempt to write this I will need to sit down and make a real plan of how I want the control flow to work in this program. What I want each function to be responsible for and what is the final output of the file. Maybe I'm assigning this function too many priorities with dealing with game state as well but well see how far I can get in this and what my plans are. Next steps are to sit down and plan the coding part is easy once you have the theory down.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

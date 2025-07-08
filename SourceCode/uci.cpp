@@ -1,4 +1,5 @@
 #include <utils.h>
+#include <uci.h>
 
 #include <cstdint>
 #include <string>
@@ -11,29 +12,6 @@
 #include <vector>
 
 // ALL DECLARATIONS
-
-// Represents the full fen string in a board representation
-struct fen_rep {
-
-    int squares[64];  // hold the values for board sqaures occupied and by what piece
-
-    // Castling rights explicitly deifned 
-    bool white_king_side_castle = false;
-    bool white_queen_side_castle = false;
-    bool black_king_side_castle = false;
-    bool black_queen_side_castle = false;
-    
-    int enpassant_square = -1;  // -1 if not availible otherwise square index
-    int half_move_clock = 0; // keep track of the 50 move rule 
-    int full_move_clock = 1; // full move numbers incremented after black to move
-
-    int to_move = 1; // 1 if white to move, 0 if black to move
-
-    fen_rep() {
-        std::fill(squares, squares + 64, empty);
-    }
-};
-
 
 // Return piece calues based on enum declartions
 int get_piece_enum(char c) {
@@ -196,7 +174,6 @@ fen_rep full_moves (fen_rep& parsed, std::string fullmoves) {
 
 
 fen_rep more_moves (fen_rep& parsed, std::vector<std::string> moremoves) {
-    std::cout << "I have ran \n";
     for (std::string move : moremoves) {
         int from = sqaure_to_index(move.substr(0,2));
         int temp = parsed.squares[from];
@@ -245,29 +222,6 @@ fen_rep fen_parser(std::string fen_string) {
 // WORKING PROGRAM 
 
 
-
-
-// remember to enclose everything in readeable comments to make evrything more intuitive
-
-
-
-
-
-
-
-/*
-int main() {
-    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 moves e2e4 e7e5 g1f3 b8c6 f1b5";
-
-    fen_rep board = fen_parser(fen);
-
-    helper_print(board);
-
-    return 0;
-}
-*/
-
-// Final representation is almost done
 /*
 LIMITATIONS:
 A partial move gen has been added but does NOT update state accurately

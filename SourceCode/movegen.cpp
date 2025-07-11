@@ -15,7 +15,9 @@ uint64_t knight_attacks[64];
 // king attacks [sqaure]
 uint64_t king_attacks[64];
 
+uint64_t bishop_masks [64];
 uint64_t bishop_attacks[64][512];
+uint64_t rook_masks [64];
 uint64_t rook_attacks[64][4096];
 
 // Constants to be used to check for capture wrap arounds
@@ -24,7 +26,10 @@ uint64_t H_file = 0x8080808080808080;
 uint64_t AB_file = A_file | (A_file << 1);
 uint64_t GH_file = H_file | (H_file >> 1);
 
-// ATTACK TABLES
+
+
+
+// LEAPER PIECE ATTACKS
 uint64_t generate_pawn_attacks(int pawn_pos, int piece_colour) {
     // Get the bitboard with the all 0s except for the start square
     uint64_t attack_mask = 0ULL | (1ULL << pawn_pos);
@@ -73,12 +78,82 @@ uint64_t generate_king_attacks(int king_pos) {
     return attack_mask;
 }
 
-uint64_t generate_rook_masks(int square){
+// LEAPER PIECE ATTACKS
 
+
+// SLIDING PIECE ATTACKS
+
+uint64_t generate_bishop_masks(int bishop_pos){
+    uint64_t relevant_occupancy_squares = 0ULL;
+
+    // init rank and files
+    int rank, file;
+
+    // init the rank and files we are interested in 
+    int target_rank = bishop_pos / 8;
+    int target_file = bishop_pos % 8;
+
+    // mask relevant occupancy squares
+    // increments rank and files along the diagonal ignoring edge squares
+    // run four loops for the four directions 
+    // using standard formula to convert rank and file to square index
+    for (rank = target_rank + 1, file = target_file + 1; rank <= 6 && file <= 6; rank++, file++) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + file));
+    }
+
+
+    for (rank = target_rank - 1, file = target_file + 1; rank >= 1 && file <= 6; rank--, file++) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + file));
+    }
+
+
+    for (rank = target_rank + 1, file = target_file - 1; rank <= 6 && file >= 1; rank++, file--) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + file));
+    }
+
+
+    for (rank = target_rank - 1, file = target_file - 1; rank >= 1 && file >= 1; rank--, file--) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + file));
+    }
+
+    return relevant_occupancy_squares;
 }
 
-uint64_t generate_bishop_masks(int square) {
+uint64_t generate_rook_masks(int rook_pos){
+    uint64_t relevant_occupancy_squares = 0ULL;
 
+    // init rank and files
+    int rank, file;
+
+    // init the rank and files we are interested in 
+    int target_rank = rook_pos / 8;
+    int target_file = rook_pos % 8;
+
+    // mask relevant occupancy squares
+    // increments rank and files along the diagonal ignoring edge squares
+    // run four loops for the four directions 
+    // using standard formula to convert rank and file to square index
+    for (rank = target_rank + 1; rank <= 6; rank++) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + target_file));
+    }
+
+
+    for (rank = target_rank - 1; rank >= 1; rank--) {
+        relevant_occupancy_squares |= (1ULL << (rank * 8 + target_file));
+    }
+
+    
+    for (file = target_file + 1; file <= 6; file++) {
+        relevant_occupancy_squares |= (1ULL << (target_rank * 8 + file));
+    }
+
+
+    for (file = target_file - 1; file >= 1; file--) {
+        relevant_occupancy_squares |= (1ULL << (target_rank * 8 + file));
+    }
+    
+    return relevant_occupancy_squares;
+    
 }
 
 // ATTACK TABLES
@@ -98,6 +173,8 @@ void all_attack_tables(){
     for (int squares = 0; squares < 64; squares++) {
         knight_attacks[squares] = generate_knight_attacks(squares);
         king_attacks[squares] = generate_king_attacks(squares);
+        bishop_masks[squares] = generate_bishop_masks(squares);
+        rook_masks[squares] = generate_rook_masks(squares);
     }
     
 }

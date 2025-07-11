@@ -65,6 +65,8 @@ I was working for the last few days so couldn't find as much time to work on thi
 
 Generated all the attack tables for leaper pieces. It was a lot easier than I expected just shifting bits around checking for wrap arounds. One thing I will have to implement is pawn pushes. Knights and kings is just a simple bitwise instruction to check for white piece occupancy and that yields the real attacks. Found this GitHub online that gives me the rook and bishop magics for now I will just have to do their masks and go from there.
 
+Its the next morning. Finished implementing the king attack tables. Generated rook and bishop masks excluding board edges. I am starting to understand how magic bitboards work but not fully this is the first step. The next step is to generate the rays considering blockers and multiply that by a magic number. I will probably use pre calculated magics save me a lot of time and effort and I doubt I will be able to make massive gains in performance by finding the maximum possible number of constructive collisions. 
+
 
 
 

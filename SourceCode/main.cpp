@@ -36,11 +36,11 @@ int main() {
 
     all_attack_tables();
 
-    //print_bitboard(generate_king_attacks(g1));
+    for (int i = 0; i < 64; i++) print_bitboard(rook_masks[i]);
+    // print_bitboard(generate_rook_masks(d5));
+    
 
-    for (int i = 0; i < 64; i++) {
-        print_bitboard(king_attacks[i]);
-    }
+    
 
     return 0;
 }

@@ -88,5 +88,10 @@ full_pos set_bitboard_pos(fen_rep& fen_pos) {
 
     full_position.to_move = fen_pos.to_move;
 
+    full_position.bitboard[white_pieces] = full_position.bitboard[white_pawns] | full_position.bitboard[white_knights] | full_position.bitboard[white_bishops] | full_position.bitboard[white_rooks] | full_position.bitboard[white_queens] | full_position.bitboard[white_king];
+    full_position.bitboard[black_pieces] = full_position.bitboard[black_pawns] | full_position.bitboard[black_knights] | full_position.bitboard[black_bishops] | full_position.bitboard[black_rooks] | full_position.bitboard[black_queens] | full_position.bitboard[black_king];
+
+    full_position.bitboard[both_pieces] = full_position.bitboard[white_pieces] | full_position.bitboard[black_pieces];
+    
     return full_position;
 }

@@ -12,7 +12,6 @@
 
 struct full_pos {
     uint64_t bitboard[piece_no];  // 6 piece types 2 colours
-    uint64_t occupancies[both_no];  // white, black and both
 
     // Castling rights explicitly deifned 
     bool white_king_side_castle = true;

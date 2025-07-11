@@ -61,6 +61,10 @@ Move onto bitboards should take a couple of days. Maybe I will refactor my macro
 
 I was working for the last few days so couldn't find as much time to work on this as I wanted to. Despite that, the bitboard works fine parsing fen strings without moves perfectly. That is stage 2 finished very happy. Next steps are to build various attack tables. After that creating a move gen function. This will have to deal with all the nuances of chess promotions, enpassant, checkmates and should be the biggest file yet of the project. Before I even attempt to write this I will need to sit down and make a real plan of how I want the control flow to work in this program. What I want each function to be responsible for and what is the final output of the file. Maybe I'm assigning this function too many priorities with dealing with game state as well but well see how far I can get in this and what my plans are. Next steps are to sit down and plan the coding part is easy once you have the theory down.
 
+11/07/25
+
+Generated all the attack tables for leaper pieces. It was a lot easier than I expected just shifting bits around checking for wrap arounds. One thing I will have to implement is pawn pushes. Knights and kings is just a simple bitwise instruction to check for white piece occupancy and that yields the real attacks. Found this GitHub online that gives me the rook and bishop magics for now I will just have to do their masks and go from there.
+
 
 
 

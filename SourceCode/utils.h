@@ -39,16 +39,13 @@ To be used later...
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 */
 
-// indexes to represent full position for each colour
-enum {
-    white_pieces, black_pieces, both_pieces,
-    both_no
-};
+
 
 // For piece case tables and indexing for array, provides constant values 
 enum {
     white_pawns, white_knights, white_bishops, white_rooks, white_queens, white_king,
     black_pawns, black_knights, black_bishops, black_rooks, black_queens, black_king,
+    white_pieces, black_pieces, both_pieces,
     piece_no, empty = -1
 };
 

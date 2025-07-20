@@ -3,7 +3,9 @@
 
 #include <cstdint>
 
+
 // https://github.com/paulsonkoly/chess-3/blob/main/movegen/tables.go
+// Reset lsb bitboard &= bitboard - 1
 
 // Intialise global attack tables
 // Pawn attacks [side][square]
@@ -27,7 +29,7 @@ uint64_t AB_file = A_file | (A_file << 1);
 uint64_t GH_file = H_file | (H_file >> 1);
 
 
-
+// ALL ATTACK TABLES
 
 // LEAPER PIECE ATTACKS
 uint64_t generate_pawn_attacks(int pawn_pos, int piece_colour) {
@@ -78,7 +80,13 @@ uint64_t generate_king_attacks(int king_pos) {
     return attack_mask;
 }
 
+// void init_leaper_attacks() {}
+
 // LEAPER PIECE ATTACKS
+
+
+
+
 
 
 // SLIDING PIECE ATTACKS
@@ -119,6 +127,44 @@ uint64_t generate_bishop_masks(int bishop_pos){
     return relevant_occupancy_squares;
 }
 
+uint64_t generate_real_bishop_attacks(uint64_t blockers, int bishop_pos) {
+    uint64_t attacks = 0ULL;
+
+    // init rank and files
+    int rank, file;
+
+    // init the rank and files we are interested in 
+    int target_rank = bishop_pos / 8;
+    int target_file = bishop_pos % 8;
+
+    // North-East
+    for (rank = target_rank + 1, file = target_file + 1; rank <= 7 && file <= 7; rank++, file++) {
+        attacks |= (1ULL << (rank * 8 + file));
+        if (blockers & (1ULL << rank * 8 + file)) break;
+    }
+
+    // South-East
+    for (rank = target_rank - 1, file = target_file + 1; rank >= 0 && file <= 7; rank--, file++) {
+        attacks |= (1ULL << (rank * 8 + file));
+        if (blockers & (1ULL << rank * 8 + file)) break;
+    }
+
+    // North-West
+    for (rank = target_rank + 1, file = target_file - 1; rank <= 7 && file >= 0; rank++, file--) {
+        attacks |= (1ULL << (rank * 8 + file));
+        if (blockers & (1ULL << rank * 8 + file)) break;
+    }
+
+    // South-West
+    for (rank = target_rank - 1, file = target_file - 1; rank >= 0 && file >= 0; rank--, file--) {
+        attacks |= (1ULL << (rank * 8 + file));
+        if (blockers & (1ULL << rank * 8 + file)) break;
+    }
+
+    return attacks;
+}
+
+
 uint64_t generate_rook_masks(int rook_pos){
     uint64_t relevant_occupancy_squares = 0ULL;
 
@@ -130,7 +176,7 @@ uint64_t generate_rook_masks(int rook_pos){
     int target_file = rook_pos % 8;
 
     // mask relevant occupancy squares
-    // increments rank and files along the diagonal ignoring edge squares
+    // increments rank and files along the vertical and horizontal ignoring edge squares
     // run four loops for the four directions 
     // using standard formula to convert rank and file to square index
     for (rank = target_rank + 1; rank <= 6; rank++) {
@@ -153,11 +199,68 @@ uint64_t generate_rook_masks(int rook_pos){
     }
     
     return relevant_occupancy_squares;
-    
 }
+
+uint64_t generate_real_rook_attacks(uint64_t blockers, int rook_pos) {
+    uint64_t attacks = 0ULL;
+
+    // init rank and files
+    int rank, file;
+
+    // init the rank and files we are interested in 
+    int target_rank = rook_pos / 8;
+    int target_file = rook_pos % 8;
+
+    // East
+    for (rank = target_rank + 1; rank <= 7; rank++) {
+        attacks |= (1ULL << (rank * 8 + target_file));
+        if (blockers & (1ULL << rank * 8 + target_file)) break;
+    }
+
+    // West
+    for (rank = target_rank - 1; rank >= 0; rank--) {
+        attacks |= (1ULL << (rank * 8 + target_file));
+        if (blockers & (1ULL << rank * 8 + target_file)) break;
+    }
+
+    // North
+    for (file = target_file + 1; file <= 7; file++) {
+        attacks |= (1ULL << (target_rank * 8 + file));
+        if (blockers & (1ULL << target_rank * 8 + file)) break;
+    }
+
+    // South
+    for (file = target_file - 1; file >= 0; file--) {
+        attacks |= (1ULL << (target_rank * 8 + file));
+        if (blockers & (1ULL << target_rank * 8 + file)) break;
+    }
+    
+    return attacks;
+}
+
+// Function will generate all possible occupancy variations
+// For a further explanation see diary
+uint64_t set_blocker_combo(int blocker_number, int bits_in_mask, uint64_t attack_mask) {
+    uint64_t blocker_combo = 0ULL;
+
+    for (int possible_sqaure_no = 0; possible_sqaure_no < bits_in_mask; possible_sqaure_no++) {
+        int current_square = get_lsb_index(attack_mask);
+        pop_bit(attack_mask, current_square);
+
+        if (blocker_number & (1ULL << possible_sqaure_no)) {
+            blocker_combo |= 1ULL << current_square;
+        }
+    }
+    
+    return blocker_combo;
+}
+
+// SLIDING PIECE ATTACKS
 
 // ATTACK TABLES
 
+
+// Change this later to call two init functions and thats it
 // GENERATE ALL ATTACK TABLES
 
 void all_attack_tables(){
@@ -187,7 +290,14 @@ blocker combo. turn that blocker config into a unique index for your table using
 look that up on rook_attack table. then filter out with your same colour pices maybe with a
 bitwise xor and that gives you the final attacks.
 */
-
+/*
+U64 bishopAttacks(U64 occ, enumSquare sq) {
+   blockers = occ & mBishopTbl[sq].mask;
+   occ = blockers * mBishopTbl[sq].magic;
+   occ >>= 64-relevant_bits; 
+   return bishopAttacks[occ]; // no offset
+}
+*/
 
 
 // Legality checking and a lot of other stuff 

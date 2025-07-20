@@ -65,6 +65,34 @@ int sqaure_to_index(const std::string& square);
 // FUNCTION DECLARATIONS
 
 
+// BIT MANIPULATIONS
+
+// Set/Get/Pop Macros can be called anymore like functions 
+
+// Set these to inline functions later
+// Left shift by square index perform Bitwise OR with bitboard
+#define set_bit(bitboard, square) (bitboard |=  (1ULL << square))
+
+// Left shift by square index perform Btiwise AND with bitbaord
+#define get_bit(bitboard, square) (bitboard & (1ULL << square))
+
+// If get bit returns true then do Bitwise XOR else return 0
+#define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
+
+
+inline int popcount(uint64_t bitboard) {
+    // Returns 0 when bitboard = 0ULL
+    return __builtin_popcountll(bitboard);
+}
+
+inline int get_lsb_index(uint64_t bitboard) {
+    // Indexed from 0-63
+    if (bitboard) return __builtin_ctzll(bitboard);
+    else return empty;
+}
+
+// BIT MANIPULATIONS
+
 
 
 

@@ -52,4 +52,5 @@ int sqaure_to_index(const std::string& square) {
     return rank * 8 + file;
 }
 
+
 // ALL DECLARATIONS

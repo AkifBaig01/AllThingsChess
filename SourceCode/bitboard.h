@@ -8,6 +8,7 @@
 #include <cstdint>
 
 
+
 // Struct to represent the full state of the game
 
 struct full_pos {

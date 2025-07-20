@@ -67,6 +67,14 @@ Generated all the attack tables for leaper pieces. It was a lot easier than I ex
 
 Its the next morning. Finished implementing the king attack tables. Generated rook and bishop masks excluding board edges. I am starting to understand how magic bitboards work but not fully this is the first step. The next step is to generate the rays considering blockers and multiply that by a magic number. I will probably use pre calculated magics save me a lot of time and effort and I doubt I will be able to make massive gains in performance by finding the maximum possible number of constructive collisions. 
 
+20/07/25
+
+Been a slow ish week did not feel like doing much with again lots of work getting in the way. I was also a bit scared about attempting the actual magic bitboard implementation. Quite frank did not understand it last week but the implementation for it seems pretty standard. I've powered through watched a few videos (code monkey king that guy is a life saver when you feel lost) read up on chess wiki which is a bit complex to be honest and not needed. Some very interesting bit manipulation concepts explored and some fascinating concepts. Starting to understand it clearly now. Magic bitboard are just hashes and the real work is in maximising the number of constructive collisions to reduce the table size and using small magic numbers well at least that's what I've got from it might be wrong. Tomorrow will look to finish the so called "fancy" magics using pre computed magics (still don't know where to find these and I have no idea why they're so hard to find online) and creating an init function. Roadmap looks as follows:
+
+attack table inits -----> move gen -----> Legality checking (probably will be the biggest challenge) ------> eval (very simple for now)  ------> search
+
+the legality checking and move gen I'll really need to look at and plan it out make sure I incorporate all the moves. I'll lay it out somehow. Refactored a bit of code as I saw fit too.
+
 
 
 

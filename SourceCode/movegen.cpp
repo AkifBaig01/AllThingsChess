@@ -1,7 +1,12 @@
+#include "movegen.h"
 #include "utils.h"
 #include "bitboard.h"
 
+
 #include <cstdint>
+#include <string.h>
+#include <assert.h>
+#include <random>
 
 
 // https://github.com/paulsonkoly/chess-3/blob/main/movegen/tables.go
@@ -17,7 +22,7 @@ uint64_t knight_attacks[64];
 // king attacks [sqaure]
 uint64_t king_attacks[64];
 
-uint64_t bishop_masks [64];
+uint64_t bishop_masks[64];
 uint64_t bishop_attacks[64][512];
 uint64_t rook_masks [64];
 uint64_t rook_attacks[64][4096];
@@ -27,6 +32,166 @@ uint64_t A_file = 0x0101010101010101;
 uint64_t H_file = 0x8080808080808080;
 uint64_t AB_file = A_file | (A_file << 1);
 uint64_t GH_file = H_file | (H_file >> 1);
+
+
+
+
+uint64_t bishop_magics[64] = {
+0x8040100401104118ULL,
+  0x2002044404204084ULL,
+  0x110008091000000ULL,
+  0x302092004000084aULL,
+  0x604042004c00800ULL,
+  0x2012086208000000ULL,
+  0x8140980402a00002ULL,
+  0x1030805011880ULL,
+  0x14004a044a10200ULL,
+  0x4000240802024a10ULL,
+  0x4088040112020129ULL,
+  0x8b04082043400100ULL,
+  0x4208040308002089ULL,
+  0x3841092818405000ULL,
+  0x140004202104202ULL,
+  0x7088008044100401ULL,
+  0x81010200800c0ULL,
+  0x5012001220210ULL,
+  0x4081800302200ULL,
+  0x204800089200c002ULL,
+  0x9a02221400a00006ULL,
+  0x60090002004202c0ULL,
+  0x2020402088080880ULL,
+  0x2002038420842400ULL,
+  0x890406010040100ULL,
+  0x10040008015400ULL,
+  0x4010884010004e00ULL,
+  0x40040000410120ULL,
+  0x2021001001004004ULL,
+  0x50024001825000ULL,
+  0x8020011821588ULL,
+  0x3902001040240ULL,
+  0x414104188890200ULL,
+  0x2056081100e00ULL,
+  0x8090840104100043ULL,
+  0x40a0080208e0200ULL,
+  0x4120464040040100ULL,
+  0x1001210100220040ULL,
+  0x2082210004220ULL,
+  0x4008084880004200ULL,
+  0x1029410c140a810ULL,
+  0x20822028c0800ULL,
+  0x10608405801000ULL,
+  0x400064010480200ULL,
+  0x608042200a010900ULL,
+  0x8081804a0c810ULL,
+  0x8110142040404ULL,
+  0x240800a082040891ULL,
+  0x2442020160080900ULL,
+  0x8240a602104c0040ULL,
+  0x2009060520880000ULL,
+  0x1028440084040008ULL,
+  0xc0405040000ULL,
+  0x81001020520ULL,
+  0x10602254004080ULL,
+  0x5080084008004ULL,
+  0x4802008200900408ULL,
+  0x30062482582000ULL,
+  0x810400020d00a810ULL,
+  0x9405202020840400ULL,
+  0x804000020024c10ULL,
+  0x4002160a0a42120ULL,
+  0x180842100a320441ULL,
+  0x23020208060582ULL,
+};
+
+int bishop_shifts [64] = {
+    6, 5, 5, 5, 5, 5, 5, 6,
+	5, 5, 5, 5, 5, 5, 5, 5,
+	5, 5, 7, 7, 7, 7, 5, 5,
+	5, 5, 7, 9, 9, 7, 5, 5,
+	5, 5, 7, 9, 9, 7, 5, 5,
+	5, 5, 7, 7, 7, 7, 5, 5,
+	5, 5, 5, 5, 5, 5, 5, 5,
+	6, 5, 5, 5, 5, 5, 5, 6,
+};
+
+uint64_t rook_magics[64] = {
+    0x408002805025c000ULL,
+    0x40100040002000ULL,
+    0x20010a202884080ULL,
+    0x200040820104200ULL,
+    0x1200080410200200ULL,
+    0x450004000900082aULL,
+    0x80010002000080ULL,
+    0x8200004210850024ULL,
+    0x2300802080004000ULL,
+    0x5400250002006ULL,
+    0x1000801000802000ULL,
+    0x5001001002508ULL,
+    0x45001100040802ULL,
+    0x1012003492000810ULL,
+    0x2a02004448010200ULL,
+    0x2000d00441082ULL,
+    0x1828001400020ULL,
+    0x49000402000400cULL,
+    0x21010010200042ULL,
+    0x20a0020120040ULL,
+    0x180808004000800ULL,
+    0x2790808004000200ULL,
+    0x840068010210ULL,
+    0xa4120010410084ULL,
+    0x48802980084000ULL,
+    0x10005040002001ULL,
+    0x410100200010ULL,
+    0x4010041180080080ULL,
+    0x8400080080800400ULL,
+    0x4040080800200ULL,
+    0x880010400021008ULL,
+    0xc110820000c32cULL,
+    0x24401020800482ULL,
+    0x9004812004804005ULL,
+    0x200080801000ULL,
+    0x800100021000900ULL,
+    0x4800400800802ULL,
+    0x1920020080800400ULL,
+    0x80204008110ULL,
+    0x1006082000401ULL,
+    0x46400a20808000ULL,
+    0x440058020048040ULL,
+    0xd018200010008080ULL,
+    0x18002100d0050008ULL,
+    0x1008000411010008ULL,
+    0x42002010040400ULL,
+    0x100114210040088ULL,
+    0x200006a400420013ULL,
+    0x402010080205a00ULL,
+    0x802000401480ULL,
+    0x1087002001104100ULL,
+    0x6021208402200ULL,
+    0x2808080080040080ULL,
+    0x1000020004008080ULL,
+    0x10010802100400ULL,
+    0x10a8008401004200ULL,
+    0x80492080010011c1ULL,
+    0x850102100804005ULL,
+    0x102021040082082ULL,
+    0x140900100600825ULL,
+    0x80a001410082132ULL,
+    0x451000802140003ULL,
+    0x804100088010204ULL,
+    0x180800810030440aULL,
+};
+
+
+int rook_shifts[64] = {
+    12, 11, 11, 11, 11, 11, 11, 12,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	12, 11, 11, 11, 11, 11, 11, 12,
+};
 
 
 // ALL ATTACK TABLES
@@ -245,7 +410,7 @@ uint64_t set_blocker_combo(int blocker_number, int bits_in_mask, uint64_t attack
 
     for (int possible_sqaure_no = 0; possible_sqaure_no < bits_in_mask; possible_sqaure_no++) {
         int current_square = get_lsb_index(attack_mask);
-        pop_bit(attack_mask, current_square);
+        attack_mask &= attack_mask - 1;
 
         if (blocker_number & (1ULL << possible_sqaure_no)) {
             blocker_combo |= 1ULL << current_square;
@@ -282,22 +447,74 @@ void all_attack_tables(){
     
 }
 
-/*
-For these magic tbales the process seems to be the same I will use rooks as an example
-do rook_masks so this says if a rook is lets a1 it can attack all the sqaures
-horizontal and vertically. then to bitwise and with all the occupency and gives you the
-blocker combo. turn that blocker config into a unique index for your table using the magic numbers
-look that up on rook_attack table. then filter out with your same colour pices maybe with a
-bitwise xor and that gives you the final attacks.
-*/
-/*
-U64 bishopAttacks(U64 occ, enumSquare sq) {
-   blockers = occ & mBishopTbl[sq].mask;
-   occ = blockers * mBishopTbl[sq].magic;
-   occ >>= 64-relevant_bits; 
-   return bishopAttacks[occ]; // no offset
+// Generate rook attack tables
+void init_rook_attacks() {
+    memset(rook_attacks, 0xFF, sizeof(rook_attacks));
+    for (int square = 0; square < 64; square++) {
+        uint64_t rook_mask = rook_masks[square];
+        int current_bits = popcount(rook_mask);
+        int index =  1 << rook_shifts[square];
+
+        for (int j = 0; j < index; j++) {
+            uint64_t current_blockers = set_blocker_combo(j, current_bits, rook_mask);
+            uint64_t store = (current_blockers * rook_magics[square]) >> (64 - rook_shifts[square]);
+            assert(rook_attacks[square][store] == 0xFFFFFFFFFFFFFFFFULL && "Magic‐table collision on rook square");            
+            rook_attacks[square][store] = generate_real_rook_attacks(current_blockers, square);
+        }
+    }
 }
-*/
 
+void init_bishop_attacks() {
+    memset(bishop_attacks, 0xFF, sizeof(bishop_attacks));
+    for (int square = 0; square < 64; square++) {
+        uint64_t bishop_mask = bishop_masks[square];
+        int current_bits = popcount(bishop_mask);
+        int index =  1 << bishop_shifts[square];
 
-// Legality checking and a lot of other stuff 
+        for (int j = 0; j < index; j++) {
+            uint64_t current_blockers = set_blocker_combo(j, current_bits, bishop_mask);
+            uint64_t store = (current_blockers * bishop_magics[square]) >> (64 - bishop_shifts[square]);
+            assert(bishop_attacks[square][store] == 0xFFFFFFFFFFFFFFFFULL && "Magic‐table collision on bishop square");
+            bishop_attacks[square][store] = generate_real_bishop_attacks(current_blockers, square);
+        }
+    }
+}    
+
+std::mt19937_64 gen(17020);
+
+uint64_t random_number() {
+    return gen() & gen() & gen();
+}
+
+uint64_t find_magics(int square, int bit_shift, int bishop) {
+    uint64_t mask, blocker_combo[4096], real_attacks[4096], used[4096], magic, index;
+    int i, k, bits_in_mask, fail;
+
+    mask = bishop? generate_bishop_masks(square) : generate_rook_masks(square);
+    bits_in_mask = popcount(mask);
+
+    for (i = 0; i < (1 << bits_in_mask); i++) {
+        blocker_combo[i] = set_blocker_combo(i, bits_in_mask, mask);
+        real_attacks[i] = bishop? generate_real_bishop_attacks(blocker_combo[i], square) : generate_real_rook_attacks(blocker_combo[i], square);
+    }
+
+    for (k = 0; k < 100000000; k++) {
+        magic = random_number();
+        if(popcount((mask * magic) & 0xFF00000000000000ULL) < 6) continue;
+        for(i = 0; i < 4096; i++) used[i] = 0ULL;
+        for(i = 0, fail = 0; !fail && i < (1 << bits_in_mask); i++) {
+            index = (blocker_combo[i] * magic) >> (64 - bit_shift);
+            if(used[index] == 0ULL) used[index] = real_attacks[i];
+            else if(used[index] != real_attacks[i]) fail = 1;    
+        }
+        if(!fail) return magic; 
+    }
+    printf("***Failed***\n");
+    return 0ULL;
+}
+
+void init_all_attacks() {
+    all_attack_tables();
+    init_rook_attacks();
+    init_bishop_attacks();
+}

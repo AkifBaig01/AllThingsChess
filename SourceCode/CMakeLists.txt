@@ -9,6 +9,7 @@ add_executable(MyChessEngine
     bitboard.cpp
     uci.cpp
     utils.cpp
+    movegen.cpp
     main.cpp
 )
 

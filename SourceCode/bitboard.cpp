@@ -6,44 +6,12 @@
 #include <iostream>
 #include <stdio.h>
 
+// Few macros just to aid readability
+#define WHITE_PIECES (full_position.bitboard[white_pawns] | full_position.bitboard[white_knights] | full_position.bitboard[white_bishops] | full_position.bitboard[white_rooks] | full_position.bitboard[white_queens] | full_position.bitboard[white_king])
+#define BLACK_PIECES (full_position.bitboard[black_pawns] | full_position.bitboard[black_knights] | full_position.bitboard[black_bishops] | full_position.bitboard[black_rooks] | full_position.bitboard[black_queens] | full_position.bitboard[black_king])
 
-
-/*
-================================================
-HELPER PRINT FOR DEBUGGING
-================================================
-*/
-
-void print_bitboard(uint64_t bitboard) {
-    // Loop over ranks
-    for (int rank = 0; rank <8; rank++) {
-        // Loop over board files
-        for (int file = 0; file < 8; file++) {
-            // convert file and rank into square index
-            int square= rank * 8 + file;
-            
-            // print ranks 
-            if (!file)
-                printf("%d - ", 8 - rank);
-
-            // Left shift 1 by the square index do a bitwise and operation return 1 if ture else 0
-            printf(" %d ", get_bit(bitboard, square) ? 1 : 0);
-        }
-
-        // Print new line every rank 
-        printf("\n");
-    }
-
-    // print board files
-    printf("\n     a  b  c  d  e  f  g  h\n\n");
-
-    // print bitbaord as an unsigned decimal number 
-    printf("Bitboard: %llud\n\n", bitboard);
-}
-
-
-
-
+// Function takes reference to fen_rep struct and simply updates
+// Its own bitboards
 full_pos set_bitboard_pos(fen_rep& fen_pos) {
     // Intialise struct to build full postition
     full_pos full_position;
@@ -57,6 +25,11 @@ full_pos set_bitboard_pos(fen_rep& fen_pos) {
     i += 1;
     }
 
+    // Allocate piece map
+    for (int j = 0; j < 64; j++) {
+        full_position.piece_map[j] = fen_pos.squares[j];
+    }
+
     // White Castling
     full_position.white_king_side_castle = fen_pos.white_king_side_castle;
     full_position.white_queen_side_castle = fen_pos.white_queen_side_castle;
@@ -67,17 +40,14 @@ full_pos set_bitboard_pos(fen_rep& fen_pos) {
 
     // Setting the rest of the flags
     full_position.enpassant_square = fen_pos.enpassant_square;
-
     full_position.half_move_clock = fen_pos.half_move_clock;
-
     full_position.full_move_clock = fen_pos.full_move_clock;
-
     full_position.to_move = fen_pos.to_move;
 
-    full_position.bitboard[white_pieces] = full_position.bitboard[white_pawns] | full_position.bitboard[white_knights] | full_position.bitboard[white_bishops] | full_position.bitboard[white_rooks] | full_position.bitboard[white_queens] | full_position.bitboard[white_king];
-    full_position.bitboard[black_pieces] = full_position.bitboard[black_pawns] | full_position.bitboard[black_knights] | full_position.bitboard[black_bishops] | full_position.bitboard[black_rooks] | full_position.bitboard[black_queens] | full_position.bitboard[black_king];
-
-    full_position.bitboard[both_pieces] = full_position.bitboard[white_pieces] | full_position.bitboard[black_pieces];
+    // Update combined piece representations
+    full_position.bitboard[white_pieces] = WHITE_PIECES;
+    full_position.bitboard[black_pieces] = BLACK_PIECES;
+    full_position.bitboard[both_pieces] = WHITE_PIECES | BLACK_PIECES;
     
     return full_position;
 }

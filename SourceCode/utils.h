@@ -3,15 +3,11 @@
 
 #include <cstdint>
 #include <string>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <bitset>
-#include <cctype>
-#include <algorithm>
 #include <vector>
 
-// ENUM DECLARTIONS
+
+
+// ------- ENUM DECLARTIONS ---------
 
 // board sqaures
 // generates constant numbers for each sqaure value e.g. e4 = 30
@@ -54,18 +50,25 @@ enum {
     white = 1, black = 0
 };
 
+// ---------- ENUM DECLARATIONS -----------
 
-// ENUM DECLARATIONS
 
-// FUNCTION DECLARATIONS
+
+// ---------- FUNCTION DECLARATIONS ---------
 std::vector<std::string> split(const std::string& lines, char delim = ' ');
 
 int sqaure_to_index(const std::string& square);
 
-// FUNCTION DECLARATIONS
+void print_bitboard(uint64_t bitboard);
+
+std::string index_to_square(int index);
+
+//  ------- FUNCTION DECLARATIONS -------------
 
 
-// BIT MANIPULATIONS
+
+
+// ----------- BIT MANIPULATIONS ---------------
 
 // Set/Get/Pop Macros can be called anymore like functions 
 
@@ -91,10 +94,6 @@ inline int get_lsb_index(uint64_t bitboard) {
     else return empty;
 }
 
-// BIT MANIPULATIONS
-
-
-
-
+// ---------- BIT MANIPULATIONS ------------------
 
 #endif

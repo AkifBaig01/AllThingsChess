@@ -1,15 +1,9 @@
 #ifndef UCI_H
 #define UCI_H
 
-#include <utils.h>
+#include "utils.h"
 
-#include <cstdint>
 #include <string>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <bitset>
-#include <cctype>
 #include <algorithm>
 #include <vector>
 

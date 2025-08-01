@@ -2,7 +2,6 @@
 #define BITBOARD_H
 
 #include "uci.h"
-#include "utils.h"
 
 #include <string>
 #include <cstdint>
@@ -13,6 +12,7 @@
 
 struct full_pos {
     uint64_t bitboard[piece_no];  // 6 piece types 2 colours
+    int piece_map[64]; // store piece map
 
     // Castling rights explicitly deifned 
     bool white_king_side_castle = true;
@@ -33,11 +33,8 @@ struct full_pos {
     }
 };
 
-
-
-
-void print_bitboard(uint64_t bitboard);
-
+// Single function to setup internal bitboards
+// Using the struct defined in the uci.cpp
 full_pos set_bitboard_pos(fen_rep& fen_pos);
 
 

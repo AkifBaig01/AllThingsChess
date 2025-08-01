@@ -7,10 +7,8 @@
 #include <string.h>
 #include <assert.h>
 #include <random>
+#include <iostream>
 
-
-// https://github.com/paulsonkoly/chess-3/blob/main/movegen/tables.go
-// Reset lsb bitboard &= bitboard - 1
 
 // Intialise global attack tables
 // Pawn attacks [side][square]
@@ -22,87 +20,80 @@ uint64_t knight_attacks[64];
 // king attacks [sqaure]
 uint64_t king_attacks[64];
 
+// piece_mask [square]
+// piece_attack[square][index]
 uint64_t bishop_masks[64];
 uint64_t bishop_attacks[64][512];
 uint64_t rook_masks [64];
 uint64_t rook_attacks[64][4096];
 
-// Constants to be used to check for capture wrap arounds
-uint64_t A_file = 0x0101010101010101;
-uint64_t H_file = 0x8080808080808080;
-uint64_t AB_file = A_file | (A_file << 1);
-uint64_t GH_file = H_file | (H_file >> 1);
-
-
-
-
+// piece magics & shifts 
 uint64_t bishop_magics[64] = {
-0x8040100401104118ULL,
-  0x2002044404204084ULL,
-  0x110008091000000ULL,
-  0x302092004000084aULL,
-  0x604042004c00800ULL,
-  0x2012086208000000ULL,
-  0x8140980402a00002ULL,
-  0x1030805011880ULL,
-  0x14004a044a10200ULL,
-  0x4000240802024a10ULL,
-  0x4088040112020129ULL,
-  0x8b04082043400100ULL,
-  0x4208040308002089ULL,
-  0x3841092818405000ULL,
-  0x140004202104202ULL,
-  0x7088008044100401ULL,
-  0x81010200800c0ULL,
-  0x5012001220210ULL,
-  0x4081800302200ULL,
-  0x204800089200c002ULL,
-  0x9a02221400a00006ULL,
-  0x60090002004202c0ULL,
-  0x2020402088080880ULL,
-  0x2002038420842400ULL,
-  0x890406010040100ULL,
-  0x10040008015400ULL,
-  0x4010884010004e00ULL,
-  0x40040000410120ULL,
-  0x2021001001004004ULL,
-  0x50024001825000ULL,
-  0x8020011821588ULL,
-  0x3902001040240ULL,
-  0x414104188890200ULL,
-  0x2056081100e00ULL,
-  0x8090840104100043ULL,
-  0x40a0080208e0200ULL,
-  0x4120464040040100ULL,
-  0x1001210100220040ULL,
-  0x2082210004220ULL,
-  0x4008084880004200ULL,
-  0x1029410c140a810ULL,
-  0x20822028c0800ULL,
-  0x10608405801000ULL,
-  0x400064010480200ULL,
-  0x608042200a010900ULL,
-  0x8081804a0c810ULL,
-  0x8110142040404ULL,
-  0x240800a082040891ULL,
-  0x2442020160080900ULL,
-  0x8240a602104c0040ULL,
-  0x2009060520880000ULL,
-  0x1028440084040008ULL,
-  0xc0405040000ULL,
-  0x81001020520ULL,
-  0x10602254004080ULL,
-  0x5080084008004ULL,
-  0x4802008200900408ULL,
-  0x30062482582000ULL,
-  0x810400020d00a810ULL,
-  0x9405202020840400ULL,
-  0x804000020024c10ULL,
-  0x4002160a0a42120ULL,
-  0x180842100a320441ULL,
-  0x23020208060582ULL,
+    0x8040100401104118ULL,
+    0x2002044404204084ULL,
+    0x110008091000000ULL,
+    0x302092004000084aULL,
+    0x604042004c00800ULL,
+    0x2012086208000000ULL,
+    0x8140980402a00002ULL,
+    0x1030805011880ULL,
+    0x14004a044a10200ULL,
+    0x4000240802024a10ULL,
+    0x4088040112020129ULL,
+    0x8b04082043400100ULL,
+    0x4208040308002089ULL,
+    0x3841092818405000ULL,
+    0x140004202104202ULL,
+    0x7088008044100401ULL,
+    0x81010200800c0ULL,
+    0x5012001220210ULL,
+    0x4081800302200ULL,
+    0x204800089200c002ULL,
+    0x9a02221400a00006ULL,
+    0x60090002004202c0ULL,
+    0x2020402088080880ULL,
+    0x2002038420842400ULL,
+    0x890406010040100ULL,
+    0x10040008015400ULL,
+    0x4010884010004e00ULL,
+    0x40040000410120ULL,
+    0x2021001001004004ULL,
+    0x50024001825000ULL,
+    0x8020011821588ULL,
+    0x3902001040240ULL,
+    0x414104188890200ULL,
+    0x2056081100e00ULL,
+    0x8090840104100043ULL,
+    0x40a0080208e0200ULL,
+    0x4120464040040100ULL,
+    0x1001210100220040ULL,
+    0x2082210004220ULL,
+    0x4008084880004200ULL,
+    0x1029410c140a810ULL,
+    0x20822028c0800ULL,
+    0x10608405801000ULL,
+    0x400064010480200ULL,
+    0x608042200a010900ULL,
+    0x8081804a0c810ULL,
+    0x8110142040404ULL,
+    0x240800a082040891ULL,
+    0x2442020160080900ULL,
+    0x8240a602104c0040ULL,
+    0x2009060520880000ULL,
+    0x1028440084040008ULL,
+    0xc0405040000ULL,
+    0x81001020520ULL,
+    0x10602254004080ULL,
+    0x5080084008004ULL,
+    0x4802008200900408ULL,
+    0x30062482582000ULL,
+    0x810400020d00a810ULL,
+    0x9405202020840400ULL,
+    0x804000020024c10ULL,
+    0x4002160a0a42120ULL,
+    0x180842100a320441ULL,
+    0x23020208060582ULL,
 };
-
 int bishop_shifts [64] = {
     6, 5, 5, 5, 5, 5, 5, 6,
 	5, 5, 5, 5, 5, 5, 5, 5,
@@ -113,7 +104,6 @@ int bishop_shifts [64] = {
 	5, 5, 5, 5, 5, 5, 5, 5,
 	6, 5, 5, 5, 5, 5, 5, 6,
 };
-
 uint64_t rook_magics[64] = {
     0x408002805025c000ULL,
     0x40100040002000ULL,
@@ -180,8 +170,6 @@ uint64_t rook_magics[64] = {
     0x804100088010204ULL,
     0x180800810030440aULL,
 };
-
-
 int rook_shifts[64] = {
     12, 11, 11, 11, 11, 11, 11, 12,
 	11, 10, 10, 10, 10, 10, 10, 11,
@@ -193,6 +181,11 @@ int rook_shifts[64] = {
 	12, 11, 11, 11, 11, 11, 11, 12,
 };
 
+// Constants to be used to check for capture wrap arounds
+uint64_t A_file = 0x0101010101010101;
+uint64_t H_file = 0x8080808080808080;
+uint64_t AB_file = A_file | (A_file << 1);
+uint64_t GH_file = H_file | (H_file >> 1);
 
 // ALL ATTACK TABLES
 
@@ -245,12 +238,7 @@ uint64_t generate_king_attacks(int king_pos) {
     return attack_mask;
 }
 
-// void init_leaper_attacks() {}
-
 // LEAPER PIECE ATTACKS
-
-
-
 
 
 
@@ -302,6 +290,7 @@ uint64_t generate_real_bishop_attacks(uint64_t blockers, int bishop_pos) {
     int target_rank = bishop_pos / 8;
     int target_file = bishop_pos % 8;
 
+    // Essentially same as mask but goes to edge and drops at first blocker on file rank
     // North-East
     for (rank = target_rank + 1, file = target_file + 1; rank <= 7 && file <= 7; rank++, file++) {
         attacks |= (1ULL << (rank * 8 + file));
@@ -340,10 +329,7 @@ uint64_t generate_rook_masks(int rook_pos){
     int target_rank = rook_pos / 8;
     int target_file = rook_pos % 8;
 
-    // mask relevant occupancy squares
-    // increments rank and files along the vertical and horizontal ignoring edge squares
-    // run four loops for the four directions 
-    // using standard formula to convert rank and file to square index
+
     for (rank = target_rank + 1; rank <= 6; rank++) {
         relevant_occupancy_squares |= (1ULL << (rank * 8 + target_file));
     }
@@ -404,12 +390,13 @@ uint64_t generate_real_rook_attacks(uint64_t blockers, int rook_pos) {
 }
 
 // Function will generate all possible occupancy variations
-// For a further explanation see diary
+// Using bit tricks e.g. all blocker combination are numbered 0 - 2^n -1
 uint64_t set_blocker_combo(int blocker_number, int bits_in_mask, uint64_t attack_mask) {
     uint64_t blocker_combo = 0ULL;
 
     for (int possible_sqaure_no = 0; possible_sqaure_no < bits_in_mask; possible_sqaure_no++) {
         int current_square = get_lsb_index(attack_mask);
+        // gets rid of lsb
         attack_mask &= attack_mask - 1;
 
         if (blocker_number & (1ULL << possible_sqaure_no)) {

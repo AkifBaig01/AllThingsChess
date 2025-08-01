@@ -11,6 +11,10 @@
 #include <algorithm>
 #include <vector>
 
+enum fen_index {
+    BOARD_POS, TO_MOVE, CASTLING, ENPASSANT, HALFMOVE, FULLMOVE, END, MOVES
+};
+
 // ALL DECLARATIONS
 
 // Return piece calues based on enum declartions
@@ -87,7 +91,7 @@ void helper_print(fen_rep& parsed) {
 // WORKING PROGRAM
 
 fen_rep board_pos(fen_rep& parsed, std::string fen) {
-    // Intialise an object of the defined struct 
+    // Init index, was aiming for the python style enumerate func
     int i = 0;
 
     // Loop through each board square
@@ -95,21 +99,17 @@ fen_rep board_pos(fen_rep& parsed, std::string fen) {
 
         // Check if isdigit if so simply skip
         if (std::isdigit(static_cast<unsigned char>(c))){
-
-            // Convert to string not char and add
-            std::string s(1,c);
-            int num = std::stoi(s);
-
-            i += num;
+            // Using the fact they are ASCII charcters
+            // The input is always constrained  1- 8 inclusive
+            i += c - '0';
         }
 
         // Start of new rank just continue 
         else if (c == '/') {
-            // did not put i += 1 seems to be working dont know why
             continue;
         }
 
-        // Real pieces call  and obtain the correct values 
+        // Real pieces call and obtain the correct values 
         else {
             parsed.squares[i] = get_piece_enum(c);
             i += 1;
@@ -133,11 +133,10 @@ fen_rep to_move(fen_rep& parsed, std::string turn_move) {
 
 fen_rep enpassant(fen_rep& parsed, std::string enpassant_square) {
     if (enpassant_square == "-") {
-        parsed.enpassant_square = -1;
+        parsed.enpassant_square = empty;
     }
     else {
-        int current_enpssant_sqaure = sqaure_to_index(enpassant_square);
-        parsed.enpassant_square = current_enpssant_sqaure;
+        parsed.enpassant_square = sqaure_to_index(enpassant_square);
     }
     
     return parsed;
@@ -146,7 +145,7 @@ fen_rep enpassant(fen_rep& parsed, std::string enpassant_square) {
 fen_rep castling(fen_rep& parsed, std::string castling_rights) {
     // Goes through string to find if char exists
     // if it does returns index where it exists 
-    // otherwise returns npos menaing "not found"
+    // otherwise returns npos menaing "not found" followed by a bool test
 
     // white rights
     parsed.white_king_side_castle = castling_rights.find('K') != std::string::npos;
@@ -159,12 +158,13 @@ fen_rep castling(fen_rep& parsed, std::string castling_rights) {
     return parsed;
 }
 
-
+// Input is something like "10"
 fen_rep half_move (fen_rep& parsed, std::string halfmove) {
     parsed.half_move_clock = std::stoi(halfmove);
 
     return parsed;
 }
+
 
 fen_rep full_moves (fen_rep& parsed, std::string fullmoves) {
     parsed.full_move_clock = std::stoi(fullmoves);
@@ -173,6 +173,9 @@ fen_rep full_moves (fen_rep& parsed, std::string fullmoves) {
 }
 
 
+// Watch out for this function it never really updates or applies moves well
+// more so a placeholder function until i get the rest of the engine up to speed
+// Currently creating a move gen function so ill just call that instead
 fen_rep more_moves (fen_rep& parsed, std::vector<std::string> moremoves) {
     for (std::string move : moremoves) {
         int from = sqaure_to_index(move.substr(0,2));
@@ -185,33 +188,23 @@ fen_rep more_moves (fen_rep& parsed, std::vector<std::string> moremoves) {
 }
 
 
-// add in split purely one function call MORE CONSCISE
+// Function to create struct which is then passed onto bitboard file
 fen_rep fen_parser(std::string fen_string) {
+    // Inits...
     fen_rep board;
     std::vector<std::string> fen_array = split(fen_string);
-    // Main parser call other helper function 
-    // Aim is to call this one fucntion to setup the final strcut to be passed onto bitbaord.cpp
-    // Want to call the list of functions in an array like python would make this alot cleaer and nicer
-    if (fen_array.size() <= 6) {
-        board = board_pos(board, fen_array[0]);
-        board = to_move(board, fen_array[1]);
-        board = castling(board, fen_array[2]);
-        board = enpassant(board, fen_array[3]);
-        board = half_move(board, fen_array[4]);
-        board = full_moves(board, fen_array[5]);
-    }
 
-    else {
-        board = board_pos(board, fen_array[0]);
-        board = to_move(board, fen_array[1]);
-        board = castling(board, fen_array[2]);
-        board = enpassant(board, fen_array[3]);
-        board = half_move(board, fen_array[4]);
-        board = full_moves(board, fen_array[5]);
-        std::vector<std::string> moves(fen_array.begin() + 7, fen_array.end());
-        for (std::string move : moves) {
-            std::cout << move << '\n';
-        }
+    // Apply each function to update representation
+    board = board_pos(board, fen_array[fen_index::BOARD_POS]);
+    board = to_move(board, fen_array[fen_index::TO_MOVE]);
+    board = castling(board, fen_array[fen_index::CASTLING]);
+    board = enpassant(board, fen_array[fen_index::ENPASSANT]);
+    board = half_move(board, fen_array[fen_index::HALFMOVE]);
+    board = full_moves(board, fen_array[fen_index::FULLMOVE]);
+
+    // If we have extra moves to parse call this helper function
+    if (fen_array.size() > fen_index::END) {
+        std::vector<std::string> moves(fen_array.begin() + fen_index::MOVES, fen_array.end());
         board = more_moves(board, moves);
     }
     
@@ -228,7 +221,4 @@ A partial move gen has been added but does NOT update state accurately
 Only the use of the position fen strign along with board elemnts is considered functional
 Move gen and legal move checking will be added later I fear it is outside the scope of this file 
 and its respnsibilities
-
-next steps are to refactor simplify comment and integrate this file with the rest of the engine
-
 */

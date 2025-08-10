@@ -12,7 +12,7 @@
 
 int main() {
     
-    std::string fen = "6k1/8/2P1P3/3B4/2p5/8/7P/6K1 w - - 0 1";
+    std::string fen = "8/8/8/8/1b6/8/8/4K3 w - - 0 1";
 
     fen_rep board = fen_parser(fen); 
 
@@ -37,22 +37,32 @@ int main() {
     
     std::cout << "This is the end of this section \n\n\n\n";
 
-    uint64_t test = 0ULL;
-
-    set_bit(test, c6);
-    set_bit(test, e6);
-    set_bit(test, c4);
-
-
     init_all_attacks();
     
     //print_bitboard(bishop_attacks[d5][(test * bishop_magics[d5]) >> bishop_shifts[d5]]);
 
-    std::vector<Move> psuedo_bishop = bishop_moves(represent, d5);
+    std::vector<Move> psuedo_white_pawn = psuedo_moves(represent);
+    int total_moves = 0;
 
-    for (Move move : psuedo_bishop) {
+    for (Move move : psuedo_white_pawn) {
         print_moves(move);
+        total_moves++;
     }
+    
+    std::cout << total_moves << std::endl;
 
+    uint64_t test = 0ULL;
+
+    set_bit(test, a1);
+    set_bit(test, b1);
+    set_bit(test, c1);
+    set_bit(test, d1);
+    set_bit(test, e1);
+    set_bit(test, f1);
+    set_bit(test, g1);
+    set_bit(test, h1);
+
+    if (is_sq_attacked(represent, e1)) std::cout << "1 I am attacked" << std::endl;
+    else std::cout << "0 Not attacked" << std::endl;
     return 0;
 }

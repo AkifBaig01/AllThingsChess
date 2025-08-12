@@ -12,6 +12,8 @@
 // white an dblack instead of always having the if else conditions
 
 
+
+
 void init_movegen() {
     init_all_attacks();
 }
@@ -24,11 +26,25 @@ struct Move {
     bool castle = false;
 };
 
+struct Undo {
+    Move move;
+    int captured_piece; // -1 if none
+    int captured_square;
+    int mover_piece;
+    bool Wkingside;
+    bool WQueenside;
+    bool BKingside;
+    bool BQueenside;
+    int old_ep_square;
+    int old_half_move;
+    
+};
+
 struct MoveHistory {
     std::vector<full_pos> prev_states; 
 };
 
-MoveHistory history;
+std::vector<Undo> history;
 
 
 void print_moves(const Move& move) {
@@ -95,7 +111,6 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos) {
     uint64_t Bocc = gamestate.bitboard[both_pieces] & Bmask;
     int Bindex = ((Bocc * bishop_magics[king_pos]) >> (64-bishop_shifts[king_pos]));
     uint64_t Battacks = bishop_attacks[king_pos][Bindex];
-    print_bitboard(Battacks);
 
     // ROOK ATTACKS
     uint64_t Rmask = rook_masks[king_pos];
@@ -104,7 +119,7 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos) {
     uint64_t Rattacks = rook_attacks[king_pos][Rindex];
 
     if (white) {
-        std::cout << "I SHOULD BE RUNNING" << std::endl;
+
         if (pawn_attacks[1][king_pos] & gamestate.bitboard[black_pawns]) return true;
         if (knight_attacks[king_pos] & gamestate.bitboard[black_knights]) return true;
         if (king_attacks[king_pos] & gamestate.bitboard[black_king]) return true;
@@ -112,12 +127,13 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos) {
         if (Rattacks & (gamestate.bitboard[black_rooks] | gamestate.bitboard[black_queens])) return true;
     
     } else {
-        std::cout << "I SHOULD NOT BE RUNNING" << std::endl;
+
         if (pawn_attacks[0][king_pos] & gamestate.bitboard[white_pawns]) return true;
         if (knight_attacks[king_pos] & gamestate.bitboard[white_knights]) return true;
         if (king_attacks[king_pos] & gamestate.bitboard[white_king]) return true;
         if (Battacks & (gamestate.bitboard[white_bishops] | gamestate.bitboard[white_queens])) return true;
         if (Rattacks & (gamestate.bitboard[white_rooks] | gamestate.bitboard[white_queens])) return true;
+    
     }
 
     return false;
@@ -492,17 +508,22 @@ std::vector<Move> psuedo_moves(const full_pos& gamestate) {
 
 
 
-void make_move(full_pos& gamestate, Move& movestate) {
-    // before we make a move, store prev state
-    history.prev_states.push_back(gamestate);
 
-    // store legal moves
-    std::vector<Move> legal_moves;
 
-    // Figure what piece are we dealing with 
 
 }
 
 void unmake_move() {
     
+    for (Move move : psuedo_legal) {
+        // Make move will flip side to move which will be opposite for side to move
+        // in the sq attacked func either modify or pass parameter with !
+        make_move();
+        if (is_sq_attacked) {
+            // discard
+        } else {
+            // 
+        }
+    }
 }
+*/

@@ -37,6 +37,7 @@ struct Undo {
     bool BQueenside;
     int old_ep_square;
     int old_half_move;
+    int old_full_move;
     
 };
 
@@ -86,7 +87,7 @@ std::vector<Move> gen_psuedo_moves(const full_pos& gamestate, uint64_t possible_
     else {
         possible_moves &= ~gamestate.bitboard[black_pieces];
     }
-    print_bitboard(possible_moves);
+    //print_bitboard(possible_moves);
 
     // if moves availble add to move array until it ends
     while (possible_moves) {
@@ -103,8 +104,8 @@ std::vector<Move> gen_psuedo_moves(const full_pos& gamestate, uint64_t possible_
 }
 
 
-bool is_sq_attacked(const full_pos& gamestate, int king_pos) {
-    bool white = gamestate.to_move;
+bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move) {
+    bool white = side_to_move;
 
     // BISHOP ATTACKS
     uint64_t Bmask = bishop_masks[king_pos];
@@ -144,14 +145,14 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos) {
 
 std::vector<Move> knight_moves(const full_pos& gamestate, int pos) {
     uint64_t possible_moves = knight_attacks[pos];
-    print_bitboard(possible_moves);
+    //print_bitboard(possible_moves);
 
     return gen_psuedo_moves(gamestate, possible_moves, pos);
 }
 
 std::vector<Move> king_moves(const full_pos& gamestate, int pos) {
     uint64_t possible_moves = king_attacks[pos];
-    print_bitboard(possible_moves);
+    //print_bitboard(possible_moves);
 
     return gen_psuedo_moves(gamestate, possible_moves, pos);
 }
@@ -508,22 +509,467 @@ std::vector<Move> psuedo_moves(const full_pos& gamestate) {
 
 
 
-
-
-
+inline void recompute_aggregates(full_pos& g) {
+    uint64_t w = 0, b = 0;
+    for (int p = white_pawns; p <= white_king; ++p) w |= g.bitboard[p];
+    for (int p = black_pawns; p <= black_king; ++p) b |= g.bitboard[p];
+    g.bitboard[white_pieces] = w;
+    g.bitboard[black_pieces] = b;
+    g.bitboard[both_pieces] = w | b;
 }
 
-void unmake_move() {
+
+void clear_piece(full_pos& state, int piece_clear, int sq_clear) {
+    pop_bit(state.bitboard[piece_clear], sq_clear);
+    state.piece_map[sq_clear] = empty;
+} 
+
+void move_piece(full_pos& state, int from, int to, int piece_moving) {
+    clear_piece(state, piece_moving, from);
+    set_bit(state.bitboard[piece_moving], to);
+    state.piece_map[to] = piece_moving;
+}
+
+
+void do_castle(full_pos& state, int Kfrom, int Kto, int Rfrom, int Rto) {
+    int king = state.piece_map[Kfrom];
+    int rook = state.piece_map[Rfrom];
+
+    // Move King to square
+    move_piece(state, Kfrom, Kto, king);
+
+    // Move Rook to square
+    move_piece(state, Rfrom, Rto, rook);
+}
+
+
+void make_move(full_pos& state, Move& move) {
+
+    int from = move.from_sq;
+    int to = move.to_sq;
+    int mover_piece = state.piece_map[from];
+
+    // Undo flags, all are intialised to prev state or empty where applicible
+    Undo undo;
+    undo.move = move;
+
+    undo.captured_piece = empty;
+    undo.captured_square = empty;
+    undo.mover_piece = mover_piece;
+
+    undo.Wkingside = state.white_king_side_castle;
+    undo.WQueenside = state.white_queen_side_castle;
+    undo.BKingside = state.black_king_side_castle;
+    undo.BQueenside = state.black_queen_side_castle;
+
+    undo.old_ep_square = state.enpassant_square;
+    undo.old_half_move = state.half_move_clock;
+    undo.old_full_move = state.full_move_clock;
+
+
+    // ---- Special Cases -----
+    // Making Moves here 
+
+
+    // Enpassant Case
     
-    for (Move move : psuedo_legal) {
-        // Make move will flip side to move which will be opposite for side to move
-        // in the sq attacked func either modify or pass parameter with !
-        make_move();
-        if (is_sq_attacked) {
-            // discard
+    if (move.ep) {
+        if (state.to_move) {
+            
+            // Set sqauare and piece to be captured
+            int captured_sqaure = to + 8;
+            int captured_piece = state.piece_map[captured_sqaure];
+            
+            // Clear captured pawn
+            clear_piece(state, captured_piece, captured_sqaure);
+        
+            // Move freindly pawn
+            move_piece(state, from, to, mover_piece);
+
+            // Save undo info 
+            undo.captured_piece = captured_piece;
+            undo.captured_square = captured_sqaure;
+
         } else {
-            // 
+
+            // Set sqauare and piece to be captured
+            int captured_sqaure = to - 8;
+            int captured_piece = state.piece_map[captured_sqaure];
+            
+            // Clear captured pawn
+            clear_piece(state, captured_piece, captured_sqaure);
+        
+            // Move freindly pawn
+            move_piece(state, from, to, mover_piece);
+
+            // Save undo info 
+            undo.captured_piece = captured_piece;
+            undo.captured_square = captured_sqaure;
+
+        }
+
+    }
+
+
+    // Promotion
+    else if (move.promotion) {
+        // Stored the mover piece in the undo info
+        int captured_square = to;
+        int captured_piece = state.piece_map[captured_square];
+
+        // Clear the pawn from the sqaure its moving from
+        clear_piece(state, mover_piece, from);
+
+        if (captured_piece != empty) {
+            // Save captured undo info
+            undo.captured_piece = captured_piece;
+            undo.captured_square = captured_square;
+
+            // Clear the captured piece
+            clear_piece(state, captured_piece, captured_square);
+        }
+
+        // Promote the pawn
+        set_bit(state.bitboard[move.promotion], to);
+        state.piece_map[to] = move.promotion;
+
+    }
+
+
+    // Castling
+    // Could abstract away reused logic but for correctness will do later
+    else if (move.castle) {
+        if (to == g1) {
+
+            // King start and end squares
+            int king_from = from;
+            int king_to = to;
+
+            // Rook start and end squares
+            int rook_from = h1;
+            int rook_to = f1;
+
+            // Move pieces 
+            do_castle(state, king_from, king_to, rook_from, rook_to);
+
+            // Disable white's right to castle
+            state.white_king_side_castle = false;
+            state.white_queen_side_castle = false;
+        }
+
+        else if (to == c1) {
+
+            // King start and end squares
+            int king_from = from;
+            int king_to = to;
+
+            // Rook start and end squares
+            int rook_from = a1;
+            int rook_to = d1;
+
+            // Move pieces 
+            do_castle(state, king_from, king_to, rook_from, rook_to);
+
+            // Disable white's right to castle
+            state.white_king_side_castle = false;
+            state.white_queen_side_castle = false;
+        }
+
+
+        else if (to ==  g8) {
+            // King start and end squares
+            int king_from = from;
+            int king_to = to;
+
+            // Rook start and end squares
+            int rook_from = h8;
+            int rook_to = f8;
+
+            // Move pieces 
+            do_castle(state, king_from, king_to, rook_from, rook_to);
+
+            // Disable black's right to castle
+            state.black_king_side_castle = false;
+            state.black_queen_side_castle = false;
+        }
+
+        else if (to == c8) {
+            // King start and end squares
+            int king_from = from;
+            int king_to = to;
+
+            // Rook start and end squares
+            int rook_from = a8;
+            int rook_to = d8;
+
+            // Move pieces 
+            do_castle(state, king_from, king_to, rook_from, rook_to);
+
+            // Disable black's right to castle
+            state.black_king_side_castle = false;
+            state.black_queen_side_castle = false;
         }
     }
+
+
+    // ---- Normal case ----
+    else {
+        int captured_square = to;
+        int captured_piece = state.piece_map[to];
+
+        if (captured_piece != empty) {
+
+            // Clear captured piece off the board 
+            clear_piece(state, captured_piece, captured_square);
+
+            // Save undo captured info
+            undo.captured_piece = captured_piece;
+            undo.captured_square = captured_square;
+        }
+
+        // Move piece to the dest square
+        move_piece(state, from, to, mover_piece);
+
+    }
+
+    // Loss of castling rightsg
+    if (!move.castle) {
+        if (mover_piece == white_rooks) {
+            if (from == a1) state.white_queen_side_castle = false;
+            if (from == h1) state.white_king_side_castle  = false;
+        }
+        if (mover_piece == black_rooks) {
+            if (from == a8) state.black_queen_side_castle = false;
+            if (from == h8) state.black_king_side_castle  = false;
+        }
+        if (mover_piece == white_king) {
+            state.white_queen_side_castle = false;
+            state.white_king_side_castle  = false;
+        }
+        if (mover_piece == black_king) {
+            state.black_queen_side_castle = false;
+            state.black_king_side_castle  = false;
+        }
+
+        // Also handle rook captured on original square:
+        if (undo.captured_piece == white_rooks) {
+            if (undo.captured_square == a1) state.white_queen_side_castle = false;
+            if (undo.captured_square == h1) state.white_king_side_castle  = false;
+        }
+        if (undo.captured_piece == black_rooks) {
+            if (undo.captured_square == a8) state.black_queen_side_castle = false;
+            if (undo.captured_square == h8) state.black_king_side_castle  = false;
+        }
+    }
+
+
+
+    // Set half move clock
+    bool is_pawn = (mover_piece == white_pawns || mover_piece == black_pawns);
+    if (is_pawn || undo.captured_piece != empty) {
+        state.half_move_clock = 0;
+    } else {
+        state.half_move_clock++;
+    }
+
+    // Set enpassant square
+    if (move.double_push) {
+        state.enpassant_square = (state.to_move) ? to + 8 : to - 8;
+    } else {
+        state.enpassant_square = empty;
+    }
+
+    // If black turn to move increment move clock
+    if (!state.to_move) {
+        state.full_move_clock++;
+    }
+
+    // Switch side to move
+    state.to_move = !state.to_move;
+
+    history.push_back(undo);
+
+    // Recompute bitboards
+    recompute_aggregates(state);
 }
-*/
+
+void unmake_move(full_pos& state){
+    // Restore flags
+    Undo undo = history.back();
+    history.pop_back();
+
+    // Flip side to move
+    state.to_move = !state.to_move;
+
+    Move move = undo.move;
+
+    state.white_king_side_castle = undo.Wkingside;
+    state.white_queen_side_castle = undo.WQueenside;
+    state.black_king_side_castle = undo.BKingside;
+    state.black_queen_side_castle = undo.BQueenside;
+
+    state.enpassant_square = undo.old_ep_square;
+    state.half_move_clock = undo.old_half_move;
+    state.full_move_clock = undo.old_full_move;
+
+    // what piece to move back
+    int mover_piece = undo.mover_piece;
+
+     
+    int from = move.from_sq;
+    int to = move.to_sq;
+
+
+    // --- Special Cases ----
+
+    // Enpassant
+    if (move.ep) {
+        int captured_square = undo.captured_square;
+        int captured_piece = undo.captured_piece;
+        // Move pawn back before enpassant
+        move_piece(state, to, from, mover_piece);
+
+        // Put the oppenent pawn back
+        set_bit(state.bitboard[captured_piece], captured_square);
+        state.piece_map[captured_square] = captured_piece;
+    }
+
+    // Promotions
+    else if (move.promotion) {
+        int promoted_piece = state.piece_map[to];
+        int promoted_square = to;
+        int pawn = undo.mover_piece;
+
+        // Clear promoted piece
+        clear_piece(state, promoted_piece, promoted_square);
+
+
+        // Capture promotion?
+        if (undo.captured_piece != empty){
+            // Set captured sqaure and piece
+            int captured_piece = undo.captured_piece;
+            int captured_square = undo.captured_square;
+
+            // Restore captured piece
+            set_bit(state.bitboard[captured_piece], captured_square);
+            state.piece_map[captured_square] = captured_piece;
+
+        }
+
+        // Restore pawn
+        set_bit(state.bitboard[pawn], from);
+        state.piece_map[from] = pawn;
+
+    }
+
+    // Castling 
+    else if (move.castle) {
+
+        if (to == g1) {
+            // Move king back 
+            move_piece(state, to, from, mover_piece);
+
+            // Move rook back
+            int rook = state.piece_map[f1];
+            move_piece(state, f1, h1, rook);
+        }
+
+        else if (to == c1) {
+            // Move king back 
+            move_piece(state, to, from, mover_piece);
+
+            // Move rook back
+            int rook = state.piece_map[d1];
+            move_piece(state, d1, a1, rook);
+        }
+
+        else if (to == g8) {
+            // Move king back 
+            move_piece(state, to, from, mover_piece);
+
+            // Move rook back
+            int rook = state.piece_map[f8];
+            move_piece(state, f8, h8, rook);
+        }
+
+        else if (to == c8) {
+            // Move king back 
+            move_piece(state, to, from, mover_piece);
+
+            // Move rook back
+            int rook = state.piece_map[d8];
+            move_piece(state, d8, a8, rook);
+        }  
+    }
+
+    // ---- Normal move -----
+    else {
+        // Move piece back 
+        move_piece(state, to, from, mover_piece);
+
+        // Captured a piece? Restore it 
+        if (undo.captured_piece != empty) {
+            set_bit(state.bitboard[undo.captured_piece], undo.captured_square);
+            state.piece_map[undo.captured_square] = undo.captured_piece;
+        }
+    }
+
+
+
+    // recompute bitboards
+    recompute_aggregates(state);
+    
+}
+
+std::vector<Move> legal_move_gen(full_pos &state) {
+    std::vector<Move> legal_moves;
+
+    int king_pos = state.to_move ? get_lsb_index(state.bitboard[white_king]) : get_lsb_index(state.bitboard[black_king]);
+
+    for (Move move : psuedo_moves(state)) {
+
+        if (move.castle) {
+
+            if (is_sq_attacked(state, king_pos, state.to_move)) {
+                continue;
+            }
+
+            if (move.to_sq == g1 && (is_sq_attacked(state, f1, state.to_move) || is_sq_attacked(state, g1, state.to_move))) {
+                continue;
+            }
+
+            if (move.to_sq == c1 && (is_sq_attacked(state, e1, state.to_move) || is_sq_attacked(state, d1, state.to_move) || is_sq_attacked(state, c1, state.to_move))) {
+                continue;
+            }
+
+            if (move.to_sq == g8 && (is_sq_attacked(state, f8, state.to_move) || is_sq_attacked(state, g8, state.to_move))) {
+                continue;
+            }
+
+            if (move.to_sq == c8 && (is_sq_attacked(state, e8, state.to_move) || is_sq_attacked(state, d8, state.to_move) || is_sq_attacked(state, c8, state.to_move))) {
+                continue;
+            }
+        }
+
+        // ---- Normal moves -----
+        make_move(state, move);
+        int king_pos = !state.to_move ? get_lsb_index(state.bitboard[white_king]) : get_lsb_index(state.bitboard[black_king]);
+        if (is_sq_attacked(state, king_pos, !state.to_move)) {
+            unmake_move(state);
+            continue;
+        }
+        else {
+            legal_moves.push_back(move);
+            unmake_move(state);
+        }
+    }
+
+    return legal_moves;
+}
+
+
+
+
+
+
+

@@ -26,6 +26,9 @@ struct full_pos {
 
     int to_move = 1; // 1 - white to move, 0 - black to move
 
+    int white_king_pos;
+    int black_king_pos;
+
     full_pos() {
         for (int i = 0; i < piece_no; i++) {
             bitboard[i] = 0ULL;

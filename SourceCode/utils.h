@@ -47,7 +47,7 @@ enum {
 
 // Great for side to move indexing
 enum {
-    white = 1, black = 0
+    WHITE = 1, BLACK = 0
 };
 
 // ---------- ENUM DECLARATIONS -----------

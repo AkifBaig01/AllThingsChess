@@ -123,10 +123,10 @@ fen_rep board_pos(fen_rep& parsed, std::string fen) {
 
 fen_rep to_move(fen_rep& parsed, std::string turn_move) {
     if (turn_move == "w") {
-        parsed.to_move = white;
+        parsed.to_move = WHITE;
     }
     else
-        parsed.to_move = black;
+        parsed.to_move = BLACK;
 
     return parsed;
 }

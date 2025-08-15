@@ -48,6 +48,10 @@ full_pos set_bitboard_pos(fen_rep& fen_pos) {
     full_position.bitboard[white_pieces] = WHITE_PIECES;
     full_position.bitboard[black_pieces] = BLACK_PIECES;
     full_position.bitboard[both_pieces] = WHITE_PIECES | BLACK_PIECES;
+
+    // Set King squares
+    full_position.white_king_pos = get_lsb_index(full_position.bitboard[white_king]);
+    full_position.black_king_pos = get_lsb_index(full_position.bitboard[black_king]);
     
     return full_position;
 }

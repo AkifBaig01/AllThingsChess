@@ -16,33 +16,6 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
       }
-    },
-    {
-      "name": "release-o3",
-      "displayName": "Release (O3 - MinGW)",
-      "description": "Release build with -O3 using MinGW",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${workspaceFolder}/build-release-o3",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
-        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG"
-      }
-    },
-    {
-      "name": "profile",
-      "displayName": "Profile (Release + gprof - MinGW)",
-      "description": "Release build with gprof profiling enabled (-pg)",
-      "generator": "MinGW Makefiles",
-      "binaryDir": "${workspaceFolder}/build-profile",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-        "CMAKE_CXX_FLAGS": "-O0 -pg -DNDEBUG",
-        "CMAKE_C_FLAGS": "-O0 -pg -DNDEBUG",
-        "CMAKE_EXE_LINKER_FLAGS": "-pg"
-      }
     }
   ]
 }

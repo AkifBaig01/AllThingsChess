@@ -49,7 +49,7 @@ enum {
 
 // Great for side to move indexing
 enum {
-    WHITE = 1, BLACK = 0
+    white = 1, black = 0
 };
 
 enum {

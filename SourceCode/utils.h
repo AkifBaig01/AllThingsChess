@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "bitboard.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -50,6 +52,10 @@ enum {
     WHITE = 1, BLACK = 0
 };
 
+enum {
+    PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+
 // ---------- ENUM DECLARATIONS -----------
 
 
@@ -62,6 +68,10 @@ int sqaure_to_index(const std::string& square);
 void print_bitboard(uint64_t bitboard);
 
 std::string index_to_square(int index);
+
+int piece_type(int piece);
+
+int piece_colour(int piece);
 
 //  ------- FUNCTION DECLARATIONS -------------
 
@@ -94,6 +104,12 @@ inline int get_lsb_index(uint64_t bitboard) {
     else return empty;
 }
 
+
+//uint64_t perft_test_make_unmake(full_pos &pos, int depth);
+
+//void print_represent(const full_pos& represent);
 // ---------- BIT MANIPULATIONS ------------------
+
+
 
 #endif

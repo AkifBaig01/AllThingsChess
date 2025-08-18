@@ -10,8 +10,6 @@ add_executable(MyChessEngine
     uci.cpp
     utils.cpp
     movegen.cpp
-    moves.cpp
-    evaluate.cpp
     main.cpp
 )
 

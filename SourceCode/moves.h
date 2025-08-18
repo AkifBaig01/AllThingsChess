@@ -14,21 +14,8 @@ struct Move {
     bool castle = false;
 };
 
-
 // Function to generate all legal moves
-std::vector<Move> legal_move_gen(full_pos &state);
-
-// Apply a move onto the board and accurately update state
-void make_move(full_pos& state, Move& move);
-
-// Undo the move always come as a pair never use unmake without its corresponding make 
-void unmake_move(full_pos& state);
-
-// Useful function
-bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move);
-
-// display the move in algabraiec notation without flags
-void print_moves(const Move& move);
+//std::vector<Move> legal_move_gen(full_pos &state);
 
 
 #endif

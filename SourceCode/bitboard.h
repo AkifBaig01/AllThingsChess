@@ -7,7 +7,9 @@
 #include <cstdint>
 
 
+
 // Struct to represent the full state of the game
+
 struct full_pos {
     uint64_t bitboard[piece_no];  // 6 piece types 2 colours
     int piece_map[64]; // store piece map

@@ -1,3 +1,4 @@
+//#include "moves.h"
 #include "bitboard.h"
 #include "utils.h"
 #include "movegen.h"
@@ -18,6 +19,14 @@ void init_movegen() {
     init_all_attacks();
 }
 
+struct Move {
+    int from_sq, to_sq;
+    int promotion = 0;
+    bool ep = false;
+    bool double_push = false;
+    bool castle = false;
+};
+
 struct Undo {
     Move move;
     int captured_piece; // -1 if none
@@ -33,17 +42,15 @@ struct Undo {
     
 };
 
-struct MoveHistory {
-    std::vector<full_pos> prev_states; 
-};
 
 std::vector<Undo> history;
+
 
 void print_moves(const Move& move) {
     std::string from = index_to_square(move.from_sq);
     std::string to = index_to_square(move.to_sq);
 
-    std::cout << from + to;
+    std::cout << from + to << std::endl;
 }
 
 // Global Constants
@@ -269,13 +276,12 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
 // ------- handle enpassants --------
     whitepawns = gamestate.bitboard[white_pawns];
     int ep = gamestate.enpassant_square;
-    if (ep != empty) { 
+    if (ep != empty) {
         uint64_t ep_bb = (1ULL << ep);
-        int ep_rank = ep + 8; 
 
         while (whitepawns) {
             int from = get_lsb_index(whitepawns);
-            if (pawn_attacks[1][from] & ep_bb) {
+            if (pawn_attacks[WHITE][from] & ep_bb) {
 
                 Move move;
                 move.from_sq = from;
@@ -375,11 +381,10 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
     int ep = gamestate.enpassant_square;
     if (ep != empty) {
         uint64_t ep_bb = (1ULL << ep);
-        int ep_rank = ep - 8;
 
         while (blackpawns) {
             int from = get_lsb_index(blackpawns);
-            if (pawn_attacks[0][from] & ep_bb) {
+            if (pawn_attacks[BLACK][from] & ep_bb) {
 
                 Move move;
                 move.from_sq = from;
@@ -756,6 +761,7 @@ void make_move(full_pos& state, Move& move) {
     }
 
 
+
     // Set half move clock
     bool is_pawn = (mover_piece == white_pawns || mover_piece == black_pawns);
     if (is_pawn || undo.captured_piece != empty) {
@@ -776,13 +782,6 @@ void make_move(full_pos& state, Move& move) {
         state.full_move_clock++;
     }
 
-    if (mover_piece == white_king) {
-        state.white_king_pos = get_lsb_index(state.bitboard[white_king]);
-    }
-    else if (mover_piece == black_king) {
-        state.black_king_pos = get_lsb_index(state.bitboard[black_king]);
-    }
-
     // Switch side to move
     state.to_move = !state.to_move;
 
@@ -792,7 +791,7 @@ void make_move(full_pos& state, Move& move) {
     recompute_aggregates(state);
 }
 
-void unmake_move(full_pos& state) {
+void unmake_move(full_pos& state){
     // Restore flags
     Undo undo = history.back();
     history.pop_back();
@@ -927,10 +926,10 @@ std::vector<Move> legal_move_gen(full_pos &state) {
 
     for (Move move : psuedo_moves(state)) {
 
-        if (move.castle) { 
+        if (move.castle) {
 
             if (is_sq_attacked(state, king_pos, state.to_move)) {
-                continue; 
+                continue;
             }
 
             if (move.to_sq == g1 && (is_sq_attacked(state, f1, state.to_move) || is_sq_attacked(state, g1, state.to_move))) {
@@ -954,7 +953,7 @@ std::vector<Move> legal_move_gen(full_pos &state) {
         make_move(state, move);
         int king_pos = !state.to_move ? get_lsb_index(state.bitboard[white_king]) : get_lsb_index(state.bitboard[black_king]);
         if (is_sq_attacked(state, king_pos, !state.to_move)) {
-            unmake_move(state); 
+            unmake_move(state);
             continue;
         }
         else {

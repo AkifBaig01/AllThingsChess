@@ -1,7 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "bitboard.h"
 
 #include <cstdint>
 #include <string>

@@ -142,63 +142,6 @@ int piece_colour(int piece) {
     }
 }
 
-// Print the current board postion represented in memory
-// May need to improve slightly
-void print_represent(const full_pos& represent) {
-        for (int i = 0; i < piece_no; i++){
-        print_bitboard(represent.bitboard[i]);
-    }
-
-    std::cout << "WHITE KING SIDE " << represent.white_king_side_castle << '\n';
-    std::cout << "WHITE QUEEN SIDE " << represent.white_queen_side_castle << '\n';
-    std::cout << "BLACK KING SIDE " << represent.black_king_side_castle << '\n';
-    std::cout << "BLACK QUEEN SIDE " << represent.black_queen_side_castle << '\n';
-
-    std::cout << "EP SQUARE " << represent.enpassant_square << '\n';
-
-    std::cout << "HALF MOVE " << represent.half_move_clock<< '\n';
-
-    std::cout << "FULL MOVE " << represent.full_move_clock << '\n';
-
-    std::cout << "TO MOVE " << represent.to_move << '\n';
-    
-    std::cout << "This is the end of this section \n\n\n\n";
-}
-
-
-// Prints out total legal moves and prints out total no of leaf nodes after each move
-uint64_t perft_test_make_unmake(full_pos &pos, int depth) {
-    if (depth == 0) return 1;
-
-    auto moves = legal_move_gen(pos);
-    uint64_t nodes = 0;
-
-    // Only print at root (when starting depth == depth passed in)
-    static int start_depth = -1;
-    if (start_depth == -1) start_depth = depth;
-
-    for (auto m : moves) {
-        make_move(pos, m);
-        uint64_t child_nodes = perft_test_make_unmake(pos, depth - 1);
-        unmake_move(pos);
-
-        nodes += child_nodes;
-
-        // Print only at root depth
-        if (depth == start_depth) {
-            print_moves(m);
-            std::cout  << " : " << child_nodes << std::endl;
-        }
-    }
-
-    if (depth == start_depth) {
-        std::cout << "Total nodes: " << nodes << std::endl;
-        start_depth = -1; // reset for next perft run
-    }
-
-    return nodes;
-}
-
 // Checks if the board postion is the same after a make an unmake 
 void test_make_unmake(full_pos& pos, Move m) {
     full_pos backup = pos; // simple struct copy

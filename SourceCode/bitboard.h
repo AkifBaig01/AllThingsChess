@@ -2,6 +2,7 @@
 #define BITBOARD_H
 
 #include "uci.h"
+#include "utils.h"
 
 #include <string>
 #include <cstdint>

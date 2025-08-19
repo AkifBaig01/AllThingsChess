@@ -1,3 +1,7 @@
+#ifndef EVALUATE_H
+#define EVALUATE_H
+
+
 #include "bitboard.h"
 #include "moves.h"
 
@@ -84,3 +88,5 @@ static constexpr int king_psqt[64] = {
 int game_ended(const full_pos& state, const std::vector<Move>& legal_moves);
 
 int evaluate(const full_pos& state);
+
+#endif

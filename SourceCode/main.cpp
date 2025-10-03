@@ -5,6 +5,7 @@
 #include "moves.h"
 #include "evaluate.h"
 
+#include "uci_real.cpp"
 
 #include <iostream>
 #include <string>
@@ -67,7 +68,8 @@ void print_represent(const full_pos& represent) {
 
 int main() {
     
-    std::string fen = "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10";
+    
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     fen_rep board = fen_parser(fen); 
 
@@ -77,11 +79,12 @@ int main() {
 
     init_all_attacks();
 
-    int depth = 4; // start with 3 or 4 for good coverage
+    int depth = 6; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
     uint64_t nodes = perft_test_make_unmake(represent, depth);
     std::cout << "Completed. Nodes: " << nodes << '\n';
 
+    
     auto moves = legal_move_gen(represent);
     std::cout << moves.size() << std::endl;
 
@@ -94,5 +97,15 @@ int main() {
     }
 
     std::cout << evaluate(represent) << std::endl;
+
+    print_represent(represent);
+
+    search(6, represent);
+
+    
+   
+    // init_all_attacks();
+    //uci_loop();
+
     return 0;
 }

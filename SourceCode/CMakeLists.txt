@@ -12,6 +12,7 @@ add_executable(MyChessEngine
     movegen.cpp
     moves.cpp
     evaluate.cpp
+    search.cpp
     main.cpp
 )
 

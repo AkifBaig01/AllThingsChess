@@ -81,6 +81,23 @@ I am happy to say the magic bitboard have been successfully generated (to the be
 
 
 
+02/08/25
+
+Generate psuedolegal ----> Make + check legality ----> if legal search
+
+
+11/08/25
+
+The engine is entering its final stages of becoming a functioning prototype. Just need to finish the legality check and that's movegen done. Implemented the pseudo legal generator was a lot easier than expected I guess its just conceptually very easy to understand. After that its just the evaluation very basic and dealing with draws wins and losses. We have our search build the UCI loop and its done. Will aim to have it done by the end of this week. Will spend the rest of my time refactoring improving and structuring the code and making it ready to be put on GitHub.
+
+Last Push 
+
+
+04/10/25
+
+Yes you read the date right, it has been just about 2 months since I last visited this codebase. I haven't updated this diary so I'll let you know where the project is at. I've completed a very basic prototype. Running the starting position to depth of 7 takes about 6 mins this is painfully slow. The program plays against itself stumbles on mates and just does everything fine-ish. As you would expect at this stage in the project. I've decided not to let this project die. However, with me at university I won't visit it as often until the end of the semester. My task now is just every now and then read over the code tweak and apply consistent naming conventions and work to sort of building clear view of how the code works, limitations and next steps. So prepare ready for a proper optimisation whenever I'm ready for it.
+
+
 
 
 

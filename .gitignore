@@ -1,0 +1,5 @@
+.vscode/
+SourceCode/build/
+SourceCode/build-release-o3/
+**/build/
+**/build-*/

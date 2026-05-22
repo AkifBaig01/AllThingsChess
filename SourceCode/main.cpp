@@ -79,7 +79,7 @@ int main() {
 
     init_all_attacks();
 
-    int depth = 6; // start with 3 or 4 for good coverage
+    int depth = 7; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
     uint64_t nodes = perft_test_make_unmake(represent, depth);
     std::cout << "Completed. Nodes: " << nodes << '\n';
@@ -96,11 +96,11 @@ int main() {
         std::cout << "Game is not playable : " << game_ended(represent, moves) << std:: endl;
     }
 
-    std::cout << evaluate(represent) << std::endl;
+    //std::cout << evaluate(represent) << std::endl;
 
-    print_represent(represent);
+    //print_represent(represent);
 
-    search(6, represent);
+    //search(6, represent);
 
     
    

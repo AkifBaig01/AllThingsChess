@@ -129,8 +129,6 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move) {
 }
 
 
-
-
 std::vector<Move> knight_moves(const full_pos& gamestate, int pos) {
     uint64_t possible_moves = knight_attacks[pos];
     //print_bitboard(possible_moves);
@@ -468,6 +466,7 @@ void append_moves_from_bitboard(std::vector<Move>& all_moves, const full_pos& ga
 
 std::vector<Move> psuedo_moves(const full_pos& gamestate) {
     std::vector<Move> all_moves;
+    all_moves.reserve(256);
 
     if (gamestate.to_move) {
 
@@ -972,10 +971,4 @@ std::vector<Move> legal_move_gen(full_pos &state) {
 
     return legal_moves;
 }
-
-
-
-
-
-
 

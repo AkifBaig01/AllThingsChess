@@ -1,0 +1,142 @@
+----------------------------------------------------------------------------
+17/06/26 
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 5;
+
+perf record
+
++   56.57%    35.39%  MyChessEngine  MyChessEngine         [.] make_move(full_po
++   40.68%    18.96%  MyChessEngine  MyChessEngine         [.] unmake_move(full_
++   22.62%     0.00%  MyChessEngine  MyChessEngine         [.] _start
++   22.62%     0.00%  MyChessEngine  libc.so.6             [.] __libc_start_main
++   22.62%     0.00%  MyChessEngine  libc.so.6             [.] __libc_start_call
++   21.80%     4.63%  MyChessEngine  MyChessEngine         [.] legal_move_gen(fu
++   20.35%     2.04%  MyChessEngine  MyChessEngine         [.] main
++   20.18%     7.51%  MyChessEngine  MyChessEngine         [.] void std::vector<
++   10.72%     5.23%  MyChessEngine  MyChessEngine         [.] is_sq_attacked(fu
++    8.88%     2.92%  MyChessEngine  libc.so.6             [.] cfree@GLIBC_2.2.5
++    8.07%     3.65%  MyChessEngine  libc.so.6             [.] malloc
++    7.66%     3.64%  MyChessEngine  libc.so.6             [.] _int_free
++    6.64%     0.00%  MyChessEngine  [unknown]             [.] 0000000000000000
++    6.21%     0.00%  MyChessEngine  [unknown]             [.] 0xa40000000000000
++    6.21%     1.40%  MyChessEngine  libstdc++.so.6.0.33   [.] operator new(unsi
++    6.17%     2.08%  MyChessEngine  MyChessEngine         [.] white_pawn_moves(
++    4.76%     2.87%  MyChessEngine  MyChessEngine         [.] void std::vector<
++    4.62%     1.74%  MyChessEngine  MyChessEngine         [.] psuedo_moves(full
++    3.57%     2.01%  MyChessEngine  MyChessEngine         [.] gen_psuedo_moves(
++    3.17%     0.00%  MyChessEngine  [unknown]             [k] 0x420000000000000
++    2.04%     0.00%  MyChessEngine  [unknown]             [.] 0xce5b3e9030f2dd6
+
+perf stat
+
+       408,200,631      task-clock                       #    0.998 CPUs utilized             
+                 3      context-switches                 #    7.349 /sec                      
+                 0      cpu-migrations                   #    0.000 /sec                      
+               707      page-faults                      #    1.732 K/sec                     
+     4,152,276,070      instructions                     #    2.62  insn per cycle            
+                                                  #    0.03  stalled cycles per insn   
+     1,586,714,486      cycles                           #    3.887 GHz                       
+       122,602,495      stalled-cycles-frontend          #    7.73% frontend cycles idle      
+       677,480,360      branches                         #    1.660 G/sec                     
+         2,567,529      branch-misses                    #    0.38% of all branches           
+
+       0.409178586 seconds time elapsed
+
+       0.405227000 seconds user
+       0.004002000 seconds sys
+
+
+
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 6;
+
++   55.30%    34.96%  MyChessEngine  MyChessEngine         [.] make_move(full_po
++   43.03%    20.55%  MyChessEngine  MyChessEngine         [.] unmake_move(full_
++   21.09%     3.91%  MyChessEngine  MyChessEngine         [.] legal_move_gen(fu
++   19.58%     3.74%  MyChessEngine  MyChessEngine         [.] perft_test_make_u
++   18.70%     7.06%  MyChessEngine  MyChessEngine         [.] void std::vector<
++   17.09%     0.00%  MyChessEngine  [unknown]             [.] 0x420000000000000
++   11.21%     4.82%  MyChessEngine  MyChessEngine         [.] is_sq_attacked(fu
++    7.97%     2.81%  MyChessEngine  libc.so.6             [.] cfree@GLIBC_2.2.5
++    7.69%     3.17%  MyChessEngine  libc.so.6             [.] malloc
++    6.54%     0.00%  MyChessEngine  [unknown]             [.] 0000000000000000
++    6.48%     3.52%  MyChessEngine  libc.so.6             [.] _int_free
++    6.39%     1.41%  MyChessEngine  libstdc++.so.6.0.33   [.] operator new(unsi
++    6.10%     1.97%  MyChessEngine  MyChessEngine         [.] black_pawn_moves(
++    5.97%     1.93%  MyChessEngine  MyChessEngine         [.] psuedo_moves(full
++    5.27%     2.69%  MyChessEngine  MyChessEngine         [.] gen_psuedo_moves(
++    5.22%     0.00%  MyChessEngine  [unknown]             [.] 0x430000000000000
++    3.71%     2.50%  MyChessEngine  MyChessEngine         [.] void std::vector<
++    2.18%     0.00%  MyChessEngine  [unknown]             [.] 0x020080000000000
++    2.14%     0.00%  MyChessEngine  [unknown]             [.] 0x020020000000000
++    2.13%     0.00%  MyChessEngine  [unknown]             [.] 0x400004000000000
++    1.98%     0.00%  MyChessEngine  [unknown]             [.] 0x400001000000000
+
+perf stat 
+
+ Performance counter stats for './MyChessEngine':
+
+     8,710,990,303      task-clock                       #    1.000 CPUs utilized             
+                85      context-switches                 #    9.758 /sec                      
+                 1      cpu-migrations                   #    0.115 /sec                      
+               710      page-faults                      #   81.506 /sec                      
+   105,934,669,868      instructions                     #    2.91  insn per cycle            
+                                                  #    0.02  stalled cycles per insn   
+    36,364,266,064      cycles                           #    4.175 GHz                       
+     1,872,289,602      stalled-cycles-frontend          #    5.15% frontend cycles idle      
+    17,350,583,568      branches                         #    1.992 G/sec                     
+        46,780,993      branch-misses                    #    0.27% of all branches           
+
+       8.712970061 seconds time elapsed
+
+       8.709828000 seconds user
+       0.001999000 seconds sys
+
+
+perf report on "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1";
+depth 6;
+
++   56.09%    32.63%  MyChessEngine  MyChessEngine         [.] make_move(full_po
++   43.45%    20.38%  MyChessEngine  MyChessEngine         [.] unmake_move(full_
++   30.36%     0.00%  MyChessEngine  [unknown]             [.] 0000000000000000
++   23.52%     4.50%  MyChessEngine  MyChessEngine         [.] legal_move_gen(fu
++   22.21%     8.30%  MyChessEngine  MyChessEngine         [.] void std::vector<
++   17.54%     2.45%  MyChessEngine  MyChessEngine         [.] perft_test_make_u
++   11.72%     5.18%  MyChessEngine  MyChessEngine         [.] is_sq_attacked(fu
++    9.35%     3.48%  MyChessEngine  libc.so.6             [.] cfree@GLIBC_2.2.5
++    9.02%     0.00%  MyChessEngine  [unknown]             [.] 0xba0000000000000
++    8.64%     4.07%  MyChessEngine  libc.so.6             [.] malloc
++    8.31%     4.49%  MyChessEngine  libc.so.6             [.] _int_free
++    7.43%     2.02%  MyChessEngine  libstdc++.so.6.0.33   [.] operator new(unsi
++    6.29%     2.32%  MyChessEngine  MyChessEngine         [.] gen_psuedo_moves(
++    3.70%     1.28%  MyChessEngine  MyChessEngine         [.] psuedo_moves(full
++    3.04%     1.21%  MyChessEngine  MyChessEngine         [.] black_pawn_moves(
++    2.25%     1.45%  MyChessEngine  MyChessEngine         [.] void std::vector<
++    2.15%     0.00%  MyChessEngine  [unknown]             [.] 0x6fd2e8c21223387
++    1.59%     0.00%  MyChessEngine  MyChessEngine         [.] _start
++    1.59%     0.00%  MyChessEngine  libc.so.6             [.] __libc_start_main
++    1.59%     0.00%  MyChessEngine  libc.so.6             [.] __libc_start_call
++    1.45%     0.19%  MyChessEngine  MyChessEngine         [.] main
+
+perf stat
+
+
+       979,063,614      task-clock                       #    0.999 CPUs utilized             
+                11      context-switches                 #   11.235 /sec                      
+                 0      cpu-migrations                   #    0.000 /sec                      
+               708      page-faults                      #  723.140 /sec                      
+    11,210,322,374      instructions                     #    2.81  insn per cycle            
+                                                  #    0.03  stalled cycles per insn   
+     3,984,345,787      cycles                           #    4.070 GHz                       
+       286,899,606      stalled-cycles-frontend          #    7.20% frontend cycles idle      
+     1,820,170,207      branches                         #    1.859 G/sec                     
+         7,360,366      branch-misses                    #    0.40% of all branches           
+
+       0.980452866 seconds time elapsed
+
+       0.976357000 seconds user
+       0.004001000 seconds sys
+
+
+
+

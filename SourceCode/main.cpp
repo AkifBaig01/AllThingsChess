@@ -69,7 +69,7 @@ void print_represent(const full_pos& represent) {
 int main() {
     
     
-    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    std::string fen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1";
 
     fen_rep board = fen_parser(fen); 
 
@@ -79,7 +79,7 @@ int main() {
 
     init_all_attacks();
 
-    int depth = 5; // start with 3 or 4 for good coverage
+    int depth = 6; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
     uint64_t nodes = perft_test_make_unmake(represent, depth);
     std::cout << "Completed. Nodes: " << nodes << '\n';

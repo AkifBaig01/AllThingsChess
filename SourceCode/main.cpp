@@ -79,7 +79,7 @@ int main() {
 
     init_all_attacks();
 
-    int depth = 7; // start with 3 or 4 for good coverage
+    int depth = 5; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
     uint64_t nodes = perft_test_make_unmake(represent, depth);
     std::cout << "Completed. Nodes: " << nodes << '\n';

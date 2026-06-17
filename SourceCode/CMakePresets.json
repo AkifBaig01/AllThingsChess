@@ -43,6 +43,41 @@
         "CMAKE_C_FLAGS": "-O0 -pg -DNDEBUG",
         "CMAKE_EXE_LINKER_FLAGS": "-pg"
       }
+    },
+
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "generator": "Ninja",
+      "binaryDir": "${workspaceFolder}/build-linux-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+      }
+    },
+
+    {
+      "name": "linux-release-o3",
+      "displayName": "Linux Release (-O3)",
+      "generator": "Ninja",
+      "binaryDir": "${workspaceFolder}/build-linux-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
+        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release-o3",
+      "configurePreset": "linux-release-o3"
     }
   ]
 }

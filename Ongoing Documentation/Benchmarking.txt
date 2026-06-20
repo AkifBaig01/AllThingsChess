@@ -137,6 +137,49 @@ perf stat
        0.976357000 seconds user
        0.004001000 seconds sys
 
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 7;
+
+Samples: 939K of event 'cycles:P', Event count (approx.): 937949287552
+Overhead  Command        Shared Object         Symbol
+  35.04%  MyChessEngine  MyChessEngine         [.] make_move(full_pos&, Move&)
+  19.71%  MyChessEngine  MyChessEngine         [.] unmake_move(full_pos&)
+   7.64%  MyChessEngine  MyChessEngine         [.] void std::vector<Move, std::a
+   4.73%  MyChessEngine  MyChessEngine         [.] legal_move_gen(full_pos&)
+   4.55%  MyChessEngine  MyChessEngine         [.] is_sq_attacked(full_pos const
+   3.84%  MyChessEngine  libc.so.6             [.] _int_free
+   3.52%  MyChessEngine  MyChessEngine         [.] perft_test_make_unmake(full_p
+   3.37%  MyChessEngine  libc.so.6             [.] malloc
+   2.83%  MyChessEngine  libc.so.6             [.] cfree@GLIBC_2.2.5
+   2.51%  MyChessEngine  MyChessEngine         [.] void std::vector<Move, std::a
+   2.29%  MyChessEngine  MyChessEngine         [.] gen_psuedo_moves(full_pos con
+   2.09%  MyChessEngine  MyChessEngine         [.] white_pawn_moves(full_pos con
+   1.71%  MyChessEngine  MyChessEngine         [.] psuedo_moves(full_pos const&)
+   1.47%  MyChessEngine  libstdc++.so.6.0.33   [.] operator new(unsigned long)
+   0.55%  MyChessEngine  MyChessEngine         [.] void append_moves_from_bitboa
+   0.47%  MyChessEngine  libc.so.6             [.] _int_malloc
+   0.42%  MyChessEngine  MyChessEngine         [.] void append_moves_from_bitboa
+   0.41%  MyChessEngine  libstdc++.so.6.0.33   [.] operator delete(void*)@plt
+   0.36%  MyChessEngine  MyChessEngine         [.] operator delete(void*, unsign
+   0.36%  MyChessEngine  libstdc++.so.6.0.33   [.] operator delete(void*)
+   0.36%  MyChessEngine  libstdc++.so.6.0.33   [.] free@plt
+
+perf stat
 
 
+   236,093,050,097      task-clock                       #    1.000 CPUs utilized             
+             2,027      context-switches                 #    8.586 /sec                      
+                69      cpu-migrations                   #    0.292 /sec                      
+               708      page-faults                      #    2.999 /sec                      
+ 2,802,234,796,353      instructions                     #    2.89  insn per cycle            
+                                                  #    0.02  stalled cycles per insn   
+   969,476,054,050      cycles                           #    4.106 GHz                       
+    55,497,876,379      stalled-cycles-frontend          #    5.72% frontend cycles idle      
+   453,181,497,176      branches                         #    1.920 G/sec                     
+     1,209,513,341      branch-misses                    #    0.27% of all branches           
+
+     236.118680760 seconds time elapsed
+
+     236.083290000 seconds user
+       0.004999000 seconds sys
 

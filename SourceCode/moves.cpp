@@ -19,15 +19,22 @@ void init_movegen() {
     init_all_attacks();
 }
 
+struct MoveList {
+    Move moves[256];
+    int count = 0;
+};
+
 struct Undo {
     Move move;
     int captured_piece; // -1 if none
     int captured_square;
     int mover_piece;
+
     bool Wkingside;
-    bool WQueenside;
+    bool WQueenside;  // Can change these to uint8_t and use bit masks
     bool BKingside;
     bool BQueenside;
+
     int old_ep_square;
     int old_half_move;
     int old_full_move;
@@ -54,19 +61,14 @@ uint64_t rank_6 = 16711680ULL;
 uint64_t rank_1 = 18374686479671623680ULL;
 // rank rank 6 and rank 1
 
-
-
-
-
-
-
-
 // writing some repetitive code when its tested and psuedo legal is working for all piece types
 // I cna abstract away the repetitive parts of my code and wrap it in a function
 
+inline void add_move(MoveList& list, const Move& move) {
+    list.moves[list.count++] = move;
+}
 
-std::vector<Move> gen_psuedo_moves(const full_pos& gamestate, uint64_t possible_moves, int pos) {
-    std::vector<Move> moves;
+void gen_psuedo_moves(const full_pos& gamestate, MoveList& list, uint64_t possible_moves, int pos) {
     // If its white to move the knight we are concerned with must be whites 
     // Otherwise its blacks
     if (gamestate.to_move) {
@@ -85,10 +87,8 @@ std::vector<Move> gen_psuedo_moves(const full_pos& gamestate, uint64_t possible_
         Move current_move;
         current_move.from_sq = pos;
         current_move.to_sq = current_square;
-        moves.push_back(current_move);
+        add_move(list, current_move);
     }
-
-    return moves;
 }
 
 
@@ -129,39 +129,38 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move) {
 }
 
 
-std::vector<Move> knight_moves(const full_pos& gamestate, int pos) {
+void knight_moves(const full_pos& gamestate, MoveList& list, int pos) {
     uint64_t possible_moves = knight_attacks[pos];
-    //print_bitboard(possible_moves);
 
-    return gen_psuedo_moves(gamestate, possible_moves, pos);
+    gen_psuedo_moves(gamestate, list, possible_moves, pos);
 }
 
-std::vector<Move> king_moves(const full_pos& gamestate, int pos) {
+void king_moves(const full_pos& gamestate, MoveList& list, int pos) {
     uint64_t possible_moves = king_attacks[pos];
     //print_bitboard(possible_moves);
 
-    return gen_psuedo_moves(gamestate, possible_moves, pos);
+    gen_psuedo_moves(gamestate, list, possible_moves, pos);
 }
 
-std::vector<Move> bishop_moves(const full_pos& gamestate, int pos) {
+void bishop_moves(const full_pos& gamestate, MoveList& list, int pos) {
     uint64_t mask = bishop_masks[pos];
     uint64_t occ = gamestate.bitboard[both_pieces] & mask;
     int index = ((occ * bishop_magics[pos]) >> (64-bishop_shifts[pos]));
 
     uint64_t possible_moves = bishop_attacks[pos][index];
-    return gen_psuedo_moves(gamestate, possible_moves, pos);
+    gen_psuedo_moves(gamestate, list, possible_moves, pos);
 }
 
-std::vector<Move> rook_moves(const full_pos& gamestate, int pos) {
+void rook_moves(const full_pos& gamestate, MoveList& list, int pos) {
     uint64_t mask = rook_masks[pos];
     uint64_t occ = gamestate.bitboard[both_pieces] & mask;
     int index = ((occ * rook_magics[pos]) >> (64-rook_shifts[pos]));
 
     uint64_t possible_moves = rook_attacks[pos][index];
-    return gen_psuedo_moves(gamestate, possible_moves, pos);
+    gen_psuedo_moves(gamestate, list, possible_moves, pos);
 }
 
-std::vector<Move> queen_moves(const full_pos& gamestate, int pos) {
+void queen_moves(const full_pos& gamestate, MoveList& list, int pos) {
     // Bishop Moves
     uint64_t maskB = bishop_masks[pos];
     uint64_t occB = gamestate.bitboard[both_pieces] & maskB;
@@ -175,7 +174,7 @@ std::vector<Move> queen_moves(const full_pos& gamestate, int pos) {
     uint64_t possible_rook_moves = rook_attacks[pos][indexR];
 
     uint64_t possible_queen_moves = possible_bishop_moves | possible_rook_moves;
-    return gen_psuedo_moves(gamestate, possible_queen_moves, pos);
+    gen_psuedo_moves(gamestate, list, possible_queen_moves, pos);
 }
 
 
@@ -184,8 +183,7 @@ std::vector<Move> queen_moves(const full_pos& gamestate, int pos) {
 // Popping bits and getting their index and abstracting away make move logic with
 // Default parameters, forgot they existed to be honest
 
-std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
-    std::vector<Move> moves;
+void white_pawn_moves(const full_pos& gamestate, MoveList& list) {
 
     // Intialise pawns, free squares and black pieces
     uint64_t whitepawns = gamestate.bitboard[white_pawns];
@@ -204,7 +202,7 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
         Move move;
         move.to_sq = get_lsb_index(quiet_single_push);
         move.from_sq = move.to_sq + 8;
-        moves.push_back(move);
+        add_move(list, move);
 
         quiet_single_push &= quiet_single_push - 1;
     }
@@ -215,7 +213,7 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
         move.to_sq = get_lsb_index(double_push);
         move.from_sq = move.to_sq + 16;
         move.double_push = true;
-        moves.push_back(move);
+        add_move(list, move);
 
         double_push &= double_push - 1;
     }
@@ -227,7 +225,7 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
         move.from_sq = move.to_sq + 8;
         for (auto promo_piece : {white_queens, white_knights, white_bishops, white_rooks}) {
             move.promotion = promo_piece;
-            moves.push_back(move);
+            add_move(list, move);
         }
 
         promotions &= promotions - 1;
@@ -249,10 +247,10 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
             if ((1ULL << to) & rank_8) {
                 for (auto promo_piece : {white_queens, white_knights, white_bishops, white_rooks}) {
                     move.promotion = promo_piece;
-                    moves.push_back(move);
+                    add_move(list, move);
                 }
             } else {
-                moves.push_back(move);
+                add_move(list, move);
             }
 
             attacks &= attacks - 1;
@@ -277,20 +275,17 @@ std::vector<Move> white_pawn_moves(const full_pos& gamestate) {
                 move.to_sq = ep;
                 move.ep = true;
 
-                moves.push_back(move);
+                add_move(list, move);
             }
             whitepawns &= whitepawns - 1;
         }
     }
 
-    return moves;
 }
 
 
 
-std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
-    std::vector<Move> moves;
-
+void black_pawn_moves(const full_pos& gamestate, MoveList& list) {
     // Intialise pawns, free squares and black pieces
     uint64_t blackpawns = gamestate.bitboard[black_pawns];
     uint64_t clear_sq = ~gamestate.bitboard[both_pieces];
@@ -308,7 +303,7 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
         Move move;
         move.to_sq = get_lsb_index(quiet_single_push);
         move.from_sq = move.to_sq - 8;
-        moves.push_back(move);
+        add_move(list, move);
 
         quiet_single_push &= quiet_single_push - 1;
     }
@@ -319,7 +314,7 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
         move.to_sq = get_lsb_index(double_push);
         move.from_sq = move.to_sq - 16;
         move.double_push = true;
-        moves.push_back(move);
+        add_move(list, move);
 
         double_push &= double_push - 1;
     }
@@ -331,7 +326,7 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
         move.from_sq = move.to_sq - 8;
         for (auto promo_piece : {black_queens, black_knights, black_bishops, black_rooks}) {
             move.promotion = promo_piece;
-            moves.push_back(move);
+            add_move(list, move);
         }
 
         promotions &= promotions - 1;
@@ -353,10 +348,10 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
             if ((1ULL << to) & rank_1) {
                 for (auto promo_piece : {black_queens, black_knights, black_bishops, black_rooks}) {
                     move.promotion = promo_piece;
-                    moves.push_back(move);
+                    add_move(list, move);
                 }
             } else {
-                moves.push_back(move);
+                add_move(list, move);
             }
 
             attacks &= attacks - 1;
@@ -381,19 +376,18 @@ std::vector<Move> black_pawn_moves(const full_pos& gamestate) {
                 move.to_sq = ep;
                 move.ep = true;
 
-                moves.push_back(move);
+                add_move(list, move);
             }
             blackpawns &= blackpawns - 1;
         }
     }
 
-    return moves;
 }
 
 
 
-std::vector<Move> castling(const full_pos& gamestate) {
-    std::vector<Move> moves;
+void castling(const full_pos& gamestate, MoveList& list) {
+
     uint64_t occupancy = gamestate.bitboard[both_pieces];
 
     // Pre-computed these just to aid redability
@@ -409,7 +403,7 @@ std::vector<Move> castling(const full_pos& gamestate) {
         move.from_sq = e1;
         move.to_sq = g1;
         move.castle = true;
-        moves.push_back(move);
+        add_move(list, move);
 
     }
 
@@ -419,7 +413,7 @@ std::vector<Move> castling(const full_pos& gamestate) {
         move.from_sq = e1;
         move.to_sq = c1;
         move.castle = true;
-        moves.push_back(move);
+        add_move(list, move);
 
     }
 
@@ -430,7 +424,7 @@ std::vector<Move> castling(const full_pos& gamestate) {
         move.from_sq = e8;
         move.to_sq = g8;
         move.castle = true;
-        moves.push_back(move);
+        add_move(list, move);
 
     }
 
@@ -440,11 +434,9 @@ std::vector<Move> castling(const full_pos& gamestate) {
         move.from_sq = e8;
         move.to_sq = c8;
         move.castle = true;
-        moves.push_back(move);
+        add_move(list, move);
 
     }
-
-    return moves;
 }
 
 
@@ -452,21 +444,19 @@ std::vector<Move> castling(const full_pos& gamestate) {
 
 // Once confirmed correct refactor all of this into a more cleaner code 
 template <typename Func>
-void append_moves_from_bitboard(std::vector<Move>& all_moves, const full_pos& gamestate, uint64_t bitboard, Func move_generator) {
+void append_moves_from_bitboard(MoveList& all_moves, const full_pos& gamestate, uint64_t bitboard, Func move_generator) {
     while (bitboard) {
         int pos = get_lsb_index(bitboard);
         bitboard &= bitboard - 1; // clear LSB
 
-        auto moves = move_generator(gamestate, pos);
-        all_moves.insert(all_moves.end(), moves.begin(), moves.end());
+        move_generator(gamestate, all_moves, pos);
     }
 }
 
 
 
-std::vector<Move> psuedo_moves(const full_pos& gamestate) {
-    std::vector<Move> all_moves;
-    all_moves.reserve(256);
+MoveList psuedo_moves(const full_pos& gamestate) {
+    MoveList all_moves;
 
     if (gamestate.to_move) {
 
@@ -475,8 +465,7 @@ std::vector<Move> psuedo_moves(const full_pos& gamestate) {
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[white_rooks], rook_moves);
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[white_queens], queen_moves);
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[white_king], king_moves);
-        auto Wpawns = white_pawn_moves(gamestate);
-        all_moves.insert(all_moves.end(), Wpawns.begin(), Wpawns.end());
+        white_pawn_moves(gamestate, all_moves);
 
     } else {
 
@@ -485,13 +474,11 @@ std::vector<Move> psuedo_moves(const full_pos& gamestate) {
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[black_rooks], rook_moves);
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[black_queens], queen_moves);
         append_moves_from_bitboard(all_moves, gamestate, gamestate.bitboard[black_king], king_moves);
-        auto Bpawns = black_pawn_moves(gamestate);
-        all_moves.insert(all_moves.end(), Bpawns.begin(), Bpawns.end());
+        black_pawn_moves(gamestate, all_moves);
 
     }
 
-    auto castles = castling(gamestate);
-    all_moves.insert(all_moves.end(), castles.begin(), castles.end());
+    castling(gamestate, all_moves);
 
     return all_moves;
 }
@@ -930,9 +917,11 @@ std::vector<Move> legal_move_gen(full_pos &state) {
     std::vector<Move> legal_moves;
 
     int king_pos = state.to_move ? state.white_king_pos : state.black_king_pos;
+    MoveList psuedo_legal = psuedo_moves(state);
 
-    for (Move move : psuedo_moves(state)) {
-
+    for (int i = 0; i < psuedo_legal.count; i++) {
+        Move move = psuedo_legal.moves[i];
+        
         if (move.castle) { 
 
             if (is_sq_attacked(state, king_pos, state.to_move)) {

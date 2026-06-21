@@ -29,10 +29,11 @@ full_pos more_moves(full_pos& parsed, const std::vector<std::string>& moremoves)
         int promo_piece = promo_char ? promo_char_to_piece(promo_char) : 0;
 
         // generate legal moves for the current position
-        std::vector<Move> legal = legal_move_gen(parsed);
+        MoveList legal = legal_move_gen(parsed);
 
         bool applied = false;
-        for (Move &m : legal) {
+        for (int i = 0; i < legal.count; i++) {
+            Move m = legal.moves[i];
             if (m.from_sq == from && m.to_sq == to) {
                 // if promotion present, ensure it matches
                 if (promo_piece != 0) {

@@ -19,7 +19,7 @@ Move best_move;
 int negamax(int alpha, int beta, int depth, full_pos& pos) {
     nodes++;
 
-    std::vector<Move> legal_moves = legal_move_gen(pos);
+    MoveList legal_moves = legal_move_gen(pos);
 
     // Check terminal states first (important)
     int has_game_ended = game_ended(pos, legal_moves);
@@ -40,7 +40,8 @@ int negamax(int alpha, int beta, int depth, full_pos& pos) {
         return evaluate(pos);
     }
 
-    for (Move &move : legal_moves) {
+    for (int i = 0; i < legal_moves.count; i++) {
+        Move move = legal_moves.moves[i];
         // make move
         ply++;
         make_move(pos, move);
@@ -75,8 +76,8 @@ int search(int depth, full_pos& pos) {
     best_move.from_sq = 0;
     best_move.to_sq   = 0;
 
-    std::vector<Move> legal_moves = legal_move_gen(pos);
-    if (legal_moves.empty()) {
+    MoveList legal_moves = legal_move_gen(pos);
+    if (legal_moves.count == 0) {
         // handle no-move (mate/stalemate) as you prefer
         printf("bestmove (none)\n");
         return 0;
@@ -86,7 +87,8 @@ int search(int depth, full_pos& pos) {
     int beta  =  INF;
 
     // root loop — explicitly set best_move here
-    for (Move &move : legal_moves) {
+    for (int i = 0; i < legal_moves.count; i++) {
+        Move move = legal_moves.moves[i];
         make_move(pos, move);
         ply++;
         int score = -negamax(-beta, -alpha, depth - 1, pos);

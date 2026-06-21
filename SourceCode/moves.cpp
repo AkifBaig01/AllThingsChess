@@ -7,22 +7,9 @@
 #include <cstdint>
 #include <iostream>
 
-// Please create a named enum for white pieces instead of just hard coding 1s everywhere
-// Very bad practice :(
-// for all these things you really need to think about how to best implement the 
-// white an dblack instead of always having the if else conditions
-
-
-
-
 void init_movegen() {
     init_all_attacks();
 }
-
-struct MoveList {
-    Move moves[256];
-    int count = 0;
-};
 
 struct Undo {
     Move move;
@@ -708,7 +695,7 @@ void make_move(full_pos& state, Move& move) {
 
     }
 
-    // Loss of castling rightsg
+    // Loss of castling rights
     if (!move.castle) {
         if (mover_piece == white_rooks) {
             if (from == a1) state.white_queen_side_castle = false;
@@ -913,8 +900,8 @@ void unmake_move(full_pos& state) {
     
 }
 
-std::vector<Move> legal_move_gen(full_pos &state) {
-    std::vector<Move> legal_moves;
+MoveList legal_move_gen(full_pos &state) {
+    MoveList legal_moves;
 
     int king_pos = state.to_move ? state.white_king_pos : state.black_king_pos;
     MoveList psuedo_legal = psuedo_moves(state);
@@ -953,7 +940,7 @@ std::vector<Move> legal_move_gen(full_pos &state) {
             continue;
         }
         else {
-            legal_moves.push_back(move);
+            add_move(legal_moves, move);
             unmake_move(state);
         }
     }

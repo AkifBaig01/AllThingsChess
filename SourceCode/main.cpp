@@ -13,14 +13,15 @@
 uint64_t perft_test_make_unmake(full_pos &pos, int depth) {
     if (depth == 0) return 1;
 
-    auto moves = legal_move_gen(pos);
+    MoveList moves = legal_move_gen(pos);
     uint64_t nodes = 0;
 
     // Only print at root (when starting depth == depth passed in)
     static int start_depth = -1;
     if (start_depth == -1) start_depth = depth;
 
-    for (auto m : moves) {
+    for (int i = 0; i < moves.count; i++) {
+        Move m = moves.moves[i];
         make_move(pos, m);
         uint64_t child_nodes = perft_test_make_unmake(pos, depth - 1);
         unmake_move(pos);
@@ -79,16 +80,16 @@ int main() {
 
     init_all_attacks();
 
-    int depth = 7; // start with 3 or 4 for good coverage
+    int depth = 6; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
     uint64_t nodes = perft_test_make_unmake(represent, depth);
     std::cout << "Completed. Nodes: " << nodes << '\n';
 
     
-    auto moves = legal_move_gen(represent);
-    std::cout << moves.size() << std::endl;
+    MoveList moves = legal_move_gen(represent);
+    std::cout << moves.count << std::endl;
 
-    for (auto move: moves) {
+    for (int i = 0; i < moves.count; i++) {
     }
     if (game_ended(represent, moves) == NONE) {
         std::cout << "Game is Playable :" << std::endl;

@@ -22,6 +22,9 @@ struct MoveList {
 // Function to generate all legal moves
 MoveList legal_move_gen(full_pos &state);
 
+// Function to generate psuedo legal moves
+MoveList psuedo_moves(const full_pos& gamestate);
+
 // Apply a move onto the board and accurately update state
 void make_move(full_pos& state, Move& move);
 

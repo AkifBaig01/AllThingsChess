@@ -183,3 +183,101 @@ perf stat
      236.083290000 seconds user
        0.004999000 seconds sys
 
+21/06/26
+
+NOTES: After the removal of std::vector from almost all places 
+
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 6;
+
+  35.22%  MyChessEngine  MyChessEngine         [.] make_move(full_pos&, Move&)
+  22.56%  MyChessEngine  MyChessEngine         [.] legal_move_gen(full_pos&)
+  18.57%  MyChessEngine  MyChessEngine         [.] unmake_move(full_pos&)
+  13.27%  MyChessEngine  MyChessEngine         [.] psuedo_moves(full_pos const&)
+   5.83%  MyChessEngine  MyChessEngine         [.] is_sq_attacked(full_pos const
+   2.10%  MyChessEngine  MyChessEngine         [.] black_pawn_moves(full_pos con
+   1.59%  MyChessEngine  MyChessEngine         [.] perft_test_make_unmake(full_p
+   0.39%  MyChessEngine  MyChessEngine         [.] queen_moves(full_pos const&,
+   0.13%  MyChessEngine  MyChessEngine         [.] castling(full_pos const&, Mov
+   0.06%  MyChessEngine  MyChessEngine         [.] white_pawn_moves(full_pos con
+   0.06%  MyChessEngine  [kernel.kallsyms]     [k] read_tsc
+   0.04%  MyChessEngine  MyChessEngine         [.] init_rook_attacks()
+   0.02%  MyChessEngine  MyChessEngine         [.] generate_real_rook_attacks(un
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] retbleed_return_thunk
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] fetch_next_timer_interrupt
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] native_irq_return_iret
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] tick_nohz_handler
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] dm_read_reg_func
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] __hrtimer_run_queues
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] __update_load_avg_se
+   0.01%  MyChessEngine  [kernel.kallsyms]     [k] hrtimer_interrupt
+
+perf stat
+
+
+     8,642,288,947      task-clock                       #    1.000 CPUs utilized             
+                72      context-switches                 #    8.331 /sec                      
+                 0      cpu-migrations                   #    0.000 /sec                      
+               712      page-faults                      #   82.386 /sec                      
+    85,155,983,006      instructions                     #    2.36  insn per cycle            
+                                                  #    0.01  stalled cycles per insn   
+    36,065,925,233      cycles                           #    4.173 GHz                       
+     1,008,693,283      stalled-cycles-frontend          #    2.80% frontend cycles idle      
+    12,904,067,280      branches                         #    1.493 G/sec                     
+        53,255,488      branch-misses                    #    0.41% of all branches           
+
+       8.643871222 seconds time elapsed
+
+       8.641201000 seconds user
+       0.001999000 seconds sys
+
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 7;
+
+perf stat
+
+Performance counter stats for './MyChessEngine':
+
+   225,639,932,182      task-clock                       #    1.000 CPUs utilized             
+             1,639      context-switches                 #    7.264 /sec                      
+                70      cpu-migrations                   #    0.310 /sec                      
+               715      page-faults                      #    3.169 /sec                      
+ 2,214,690,697,398      instructions                     #    2.39  insn per cycle            
+                                                  #    0.01  stalled cycles per insn     (71.43%)
+   926,704,374,123      cycles                           #    4.107 GHz                         (71.43%)
+    29,289,222,352      stalled-cycles-frontend          #    3.16% frontend cycles idle        (71.43%)
+   330,047,408,619      branches                         #    1.463 G/sec                       (71.43%)
+     1,348,132,285      branch-misses                    #    0.41% of all branches             (71.43%)
+ 1,128,603,157,184      L1-dcache-loads                  #    5.002 G/sec                       (71.43%)
+       789,752,336      L1-dcache-load-misses            #    0.07% of all L1-dcache accesses   (71.43%)
+
+     225.660724576 seconds time elapsed
+
+     225.562740000 seconds user
+       0.074994000 seconds sys
+
+27/06/26
+
+perf report on "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+depth 6;
+
+
+     4,543,568,455      task-clock                       #    0.999 CPUs utilized             
+                41      context-switches                 #    9.024 /sec                      
+                 0      cpu-migrations                   #    0.000 /sec                      
+               712      page-faults                      #  156.705 /sec                      
+    51,844,667,859      instructions                     #    2.73  insn per cycle            
+                                                  #    0.01  stalled cycles per insn   
+    19,012,333,609      cycles                           #    4.184 GHz                       
+       553,610,932      stalled-cycles-frontend          #    2.91% frontend cycles idle      
+     8,680,300,720      branches                         #    1.910 G/sec                     
+        32,429,576      branch-misses                    #    0.37% of all branches           
+
+       4.546040808 seconds time elapsed
+
+       4.541833000 seconds user
+       0.002998000 seconds sys
+
+
+
+

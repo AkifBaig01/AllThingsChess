@@ -82,11 +82,32 @@ void gen_psuedo_moves(const full_pos& gamestate, MoveList& list, uint64_t possib
 bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move) {
     bool white = side_to_move;
 
+    if (white) {
+
+        if (pawn_attacks[WHITE][king_pos] & gamestate.bitboard[black_pawns]) return true;
+        if (knight_attacks[king_pos] & gamestate.bitboard[black_knights]) return true;
+        if (king_attacks[king_pos] & gamestate.bitboard[black_king]) return true;
+    
+    } else {
+
+        if (pawn_attacks[BLACK][king_pos] & gamestate.bitboard[white_pawns]) return true;
+        if (knight_attacks[king_pos] & gamestate.bitboard[white_knights]) return true;
+        if (king_attacks[king_pos] & gamestate.bitboard[white_king]) return true;
+    
+    }
+
     // BISHOP ATTACKS
     uint64_t Bmask = bishop_masks[king_pos];
     uint64_t Bocc = gamestate.bitboard[both_pieces] & Bmask;
     int Bindex = ((Bocc * bishop_magics[king_pos]) >> (64-bishop_shifts[king_pos]));
     uint64_t Battacks = bishop_attacks[king_pos][Bindex];
+
+
+    if (white){
+        if (Battacks & (gamestate.bitboard[black_bishops] | gamestate.bitboard[black_queens])) return true;
+    } else {
+        if (Battacks & (gamestate.bitboard[white_bishops] | gamestate.bitboard[white_queens])) return true;
+    }
 
     // ROOK ATTACKS
     uint64_t Rmask = rook_masks[king_pos];
@@ -95,21 +116,9 @@ bool is_sq_attacked(const full_pos& gamestate, int king_pos, int side_to_move) {
     uint64_t Rattacks = rook_attacks[king_pos][Rindex];
 
     if (white) {
-
-        if (pawn_attacks[WHITE][king_pos] & gamestate.bitboard[black_pawns]) return true;
-        if (knight_attacks[king_pos] & gamestate.bitboard[black_knights]) return true;
-        if (king_attacks[king_pos] & gamestate.bitboard[black_king]) return true;
-        if (Battacks & (gamestate.bitboard[black_bishops] | gamestate.bitboard[black_queens])) return true;
         if (Rattacks & (gamestate.bitboard[black_rooks] | gamestate.bitboard[black_queens])) return true;
-    
     } else {
-
-        if (pawn_attacks[BLACK][king_pos] & gamestate.bitboard[white_pawns]) return true;
-        if (knight_attacks[king_pos] & gamestate.bitboard[white_knights]) return true;
-        if (king_attacks[king_pos] & gamestate.bitboard[white_king]) return true;
-        if (Battacks & (gamestate.bitboard[white_bishops] | gamestate.bitboard[white_queens])) return true;
         if (Rattacks & (gamestate.bitboard[white_rooks] | gamestate.bitboard[white_queens])) return true;
-    
     }
 
     return false;
@@ -484,13 +493,36 @@ inline void recompute_aggregates(full_pos& g) {
 
 void clear_piece(full_pos& state, int piece_clear, int sq_clear) {
     pop_bit(state.bitboard[piece_clear], sq_clear);
+    pop_bit(state.bitboard[both_pieces], sq_clear);
     state.piece_map[sq_clear] = empty;
+    if (piece_clear <= white_king){
+        pop_bit(state.bitboard[white_pieces], sq_clear);
+    } else {
+        pop_bit(state.bitboard[black_pieces], sq_clear);
+    }
 } 
 
 void move_piece(full_pos& state, int from, int to, int piece_moving) {
     clear_piece(state, piece_moving, from);
     set_bit(state.bitboard[piece_moving], to);
+    set_bit(state.bitboard[both_pieces], to);
     state.piece_map[to] = piece_moving;
+    if (piece_moving <= white_king){
+        set_bit(state.bitboard[white_pieces], to);
+    } else {
+        set_bit(state.bitboard[black_pieces], to);
+    }
+}
+
+void put_piece(full_pos& state, int piece, int sq){
+    set_bit(state.bitboard[piece], sq);
+    set_bit(state.bitboard[both_pieces], sq);
+    state.piece_map[sq] = piece;
+    if (piece <= white_king){
+        set_bit(state.bitboard[white_pieces], sq);
+    } else {
+        set_bit(state.bitboard[black_pieces], sq);
+    }
 }
 
 
@@ -593,8 +625,7 @@ void make_move(full_pos& state, Move& move) {
         }
 
         // Promote the pawn
-        set_bit(state.bitboard[move.promotion], to);
-        state.piece_map[to] = move.promotion;
+        put_piece(state, move.promotion, to);
 
     }
 
@@ -760,9 +791,6 @@ void make_move(full_pos& state, Move& move) {
     state.to_move = !state.to_move;
 
     history.push_back(undo);
-
-    // Recompute bitboards
-    recompute_aggregates(state);
 }
 
 void unmake_move(full_pos& state) {
@@ -802,8 +830,7 @@ void unmake_move(full_pos& state) {
         move_piece(state, to, from, mover_piece);
 
         // Put the oppenent pawn back
-        set_bit(state.bitboard[captured_piece], captured_square);
-        state.piece_map[captured_square] = captured_piece;
+        put_piece(state, captured_piece, captured_square);
     }
 
     // Promotions
@@ -823,14 +850,11 @@ void unmake_move(full_pos& state) {
             int captured_square = undo.captured_square;
 
             // Restore captured piece
-            set_bit(state.bitboard[captured_piece], captured_square);
-            state.piece_map[captured_square] = captured_piece;
-
+            put_piece(state, captured_piece, captured_square);
         }
 
         // Restore pawn
-        set_bit(state.bitboard[pawn], from);
-        state.piece_map[from] = pawn;
+        put_piece(state, pawn, from);
 
     }
 
@@ -881,8 +905,7 @@ void unmake_move(full_pos& state) {
 
         // Captured a piece? Restore it 
         if (undo.captured_piece != empty) {
-            set_bit(state.bitboard[undo.captured_piece], undo.captured_square);
-            state.piece_map[undo.captured_square] = undo.captured_piece;
+            put_piece(state, undo.captured_piece, undo.captured_square);
         }
     }
 
@@ -892,12 +915,6 @@ void unmake_move(full_pos& state) {
     else if (mover_piece == black_king) {
         state.black_king_pos = get_lsb_index(state.bitboard[black_king]);
     }
-
-
-
-    // recompute bitboards
-    recompute_aggregates(state);
-    
 }
 
 MoveList legal_move_gen(full_pos &state) {

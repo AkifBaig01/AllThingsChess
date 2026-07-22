@@ -105,6 +105,10 @@ Target moves.cpp -----> Get rid of vectors ------> Refactor move struct ------> 
 
 The last part is quite important. The file right now is too big at 900+ lines. However, it cannot be rushed. In my opinion the optimisations must happen first before the file is broken up into samller more compact units. From what I have seen so far the code is written to a standard. I have grown as a programmer over the past year so obvioulsy there are improvments to be made but not as bad as I once thought.
 
+27/06/26
+
+Carried out major refactoring work. Got rid of mostly all dynamic allocations, still some left but it will be gone soon. Brought the running time from 236s startpos to depth 7 down to 114s. Fairly happy with that. There is still alot more room I feel to optimise it, maybe reach sub 2.5mins. Overall has been great. Nodes per second (nps) improved from 13.6m to 26.2m, almost double. Linux has been great in its profiling tools great switch. The terminal tools are also great make building and modifying code fell part of the system not an abstracted away after thought. Lets see how far I cna get it down. Although Ill give myself a week before I move on to the actual search. 
+
 
 
 

@@ -27,8 +27,12 @@ struct Undo {
     int old_full_move;
     
 };
+struct HistoryList{
+    Undo history[256];
+    int count = 0;
+};
 
-std::vector<Undo> history;
+HistoryList historyList;
 
 void print_moves(const Move& move) {
     std::string from = index_to_square(move.from_sq);
@@ -790,13 +794,12 @@ void make_move(full_pos& state, Move& move) {
     // Switch side to move
     state.to_move = !state.to_move;
 
-    history.push_back(undo);
+    historyList.history[historyList.count++] = undo;
 }
 
 void unmake_move(full_pos& state) {
     // Restore flags
-    Undo undo = history.back();
-    history.pop_back();
+    Undo undo = historyList.history[--historyList.count];
 
     // Flip side to move
     state.to_move = !state.to_move;

@@ -152,8 +152,8 @@ int main() {
 
     int depth = 7; // start with 3 or 4 for good coverage
     std::cout << "Running perft_test_make_unmake depth " << depth << "...\n";
-    //uint64_t nodes = real_perft(represent, depth);
-    //std::cout << "Completed. Nodes: " << nodes << '\n';
+    uint64_t nodes = real_perft(represent, depth);
+    std::cout << "Completed. Nodes: " << nodes << '\n';
 
     
     MoveList moves = legal_move_gen(represent);
@@ -178,7 +178,7 @@ int main() {
     
    
     // init_all_attacks();
-    uci_loop();
+    //uci_loop();
 
     return 0;
 }

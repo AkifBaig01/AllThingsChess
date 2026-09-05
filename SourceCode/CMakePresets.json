@@ -1,46 +1,63 @@
 {
   "version": 3,
+
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 10,
+    "minor": 21,
     "patch": 0
   },
+
   "configurePresets": [
     {
-      "name": "default",
-      "displayName": "Default (Debug - MinGW)",
-      "description": "Default Debug build using MinGW",
+      "name": "windows-debug",
+      "displayName": "Windows Debug (MinGW)",
+      "description": "Debug build using MinGW",
       "generator": "MinGW Makefiles",
-      "binaryDir": "${workspaceFolder}/build",
+      "binaryDir": "${sourceDir}/../build-windows-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
       }
     },
+
     {
-      "name": "release-o3",
-      "displayName": "Release (O3 - MinGW)",
+      "name": "windows-release",
+      "displayName": "Windows Release (O3 - MinGW)",
       "description": "Release build with -O3 using MinGW",
       "generator": "MinGW Makefiles",
-      "binaryDir": "${workspaceFolder}/build-release-o3",
+      "binaryDir": "${sourceDir}/../build-windows-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
-        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG"
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
       }
     },
+
     {
-      "name": "profile",
-      "displayName": "Profile (Release + gprof - MinGW)",
-      "description": "Release build with gprof profiling enabled (-pg)",
+      "name": "windows-profile",
+      "displayName": "Windows Profile (gprof - MinGW)",
+      "description": "Profiling build using gprof",
       "generator": "MinGW Makefiles",
-      "binaryDir": "${workspaceFolder}/build-profile",
+      "binaryDir": "${sourceDir}/../build-windows-profile",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
         "CMAKE_CXX_FLAGS": "-O0 -pg -DNDEBUG",
-        "CMAKE_C_FLAGS": "-O0 -pg -DNDEBUG",
         "CMAKE_EXE_LINKER_FLAGS": "-pg"
       }
     },
@@ -48,8 +65,14 @@
     {
       "name": "linux-debug",
       "displayName": "Linux Debug",
+      "description": "Debug build using Ninja",
       "generator": "Ninja",
-      "binaryDir": "${workspaceFolder}/build-linux-debug",
+      "binaryDir": "${sourceDir}/../build-linux-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
@@ -57,40 +80,72 @@
     },
 
     {
-      "name": "linux-release-o3",
-      "displayName": "Linux Release (-O3)",
+      "name": "linux-release",
+      "displayName": "Linux Release (O3)",
+      "description": "Release build with -O3 using Ninja",
       "generator": "Ninja",
-      "binaryDir": "${workspaceFolder}/build-linux-release",
+      "binaryDir": "${sourceDir}/../build-linux-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG",
-        "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG"
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG"
       }
     },
 
     {
       "name": "linux-profile",
       "displayName": "Linux Profile (O3 + Debug Symbols)",
+      "description": "Optimised Linux build with debug symbols",
       "generator": "Ninja",
-      "binaryDir": "${workspaceFolder}/build-linux-profile",
+      "binaryDir": "${sourceDir}/../build-linux-profile",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O3 -g -DNDEBUG",
-        "CMAKE_C_FLAGS_RELWITHDEBINFO": "-O3 -g -DNDEBUG"
+        "CMAKE_CXX_FLAGS_RELWITHDEBINFO": "-O3 -g -DNDEBUG"
       }
     }
   ],
 
   "buildPresets": [
     {
+      "name": "windows-debug",
+      "displayName": "Build Windows Debug",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Build Windows Release",
+      "configurePreset": "windows-release"
+    },
+    {
+      "name": "windows-profile",
+      "displayName": "Build Windows Profile",
+      "configurePreset": "windows-profile"
+    },
+    {
       "name": "linux-debug",
+      "displayName": "Build Linux Debug",
       "configurePreset": "linux-debug"
     },
     {
-      "name": "linux-release-o3",
-      "configurePreset": "linux-release-o3"
+      "name": "linux-release",
+      "displayName": "Build Linux Release",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "linux-profile",
+      "displayName": "Build Linux Profile",
+      "configurePreset": "linux-profile"
     }
   ]
 }

@@ -1,12 +1,36 @@
-cmake_minimum_required(VERSION 3.10)
-project(MyChessEngine VERSION 0.1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.14)
 
-# Default to Release if not specified
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+set(lib ChessLib)
+set(engine MyChessEngine)
 
-add_executable(MyChessEngine
+project(${engine} VERSION 0.1.0 LANGUAGES C CXX)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+enable_testing()
+
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.17.0
+)
+
+FetchContent_MakeAvailable(googletest)
+
+set(Headers
+    bitboard.h
+    uci.h
+    movegen.h
+    moves.h
+    search.h
+    evaluate.h
+)
+
+set(Sources
     bitboard.cpp
     uci.cpp
     utils.cpp
@@ -14,17 +38,22 @@ add_executable(MyChessEngine
     moves.cpp
     evaluate.cpp
     search.cpp
+)
+
+add_library(${lib} STATIC 
+    ${Headers} ${Sources}
+)
+
+target_include_directories(${lib} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_executable(${engine}
     main.cpp
 )
 
-target_include_directories(MyChessEngine PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TARGET MyChessEngine PROPERTY CXX_STANDARD 17)
+target_link_libraries(${engine} PRIVATE
+    ${lib}
+)
 
-# Optimisation flags for GCC / Clang
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(MyChessEngine PRIVATE
-        -O3
-        -march=native
-        -DNDEBUG
-    )
-endif()
+add_subdirectory(tests)

@@ -22,14 +22,14 @@ inline int square_color(int sq) {
 
 // --- Game end checks ---
 
-bool is_checkmate(const full_pos& state, const std::vector<Move>& legal_moves) {
-    if (!legal_moves.empty()) return false;
+bool is_checkmate(const full_pos& state, const MoveList& legal_moves) {
+    if (legal_moves.count != 0) return false;
     int king_pos = (state.to_move == WHITE) ? state.white_king_pos : state.black_king_pos;
     return is_sq_attacked(state, king_pos, state.to_move);
 }
 
-bool is_stalemate(const full_pos& state, const std::vector<Move>& legal_moves) {
-    if (!legal_moves.empty()) return false;
+bool is_stalemate(const full_pos& state, const MoveList& legal_moves) {
+    if (legal_moves.count != 0) return false;
     int king_pos = (state.to_move == WHITE) ? state.white_king_pos : state.black_king_pos;
     return !is_sq_attacked(state, king_pos, state.to_move);
 }
@@ -113,7 +113,7 @@ bool is_insufficient_material(const full_pos& board) {
 }
 
 // Start with out high level concept
-int game_ended(const full_pos& state, const std::vector<Move>& legal_moves) {
+int game_ended(const full_pos& state, const MoveList& legal_moves) {
     if (is_checkmate(state, legal_moves)) return CHECKMATE;
 
     if (is_stalemate(state, legal_moves)) return STALEMATE;

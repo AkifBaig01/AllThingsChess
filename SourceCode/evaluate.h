@@ -85,7 +85,7 @@ static constexpr int king_psqt[64] = {
 
 
 
-int game_ended(const full_pos& state, const std::vector<Move>& legal_moves);
+int game_ended(const full_pos& state, const MoveList& legal_moves);
 
 int evaluate(const full_pos& state);
 

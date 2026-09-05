@@ -97,7 +97,17 @@ Last Push
 
 Yes you read the date right, it has been just about 2 months since I last visited this codebase. I haven't updated this diary so I'll let you know where the project is at. I've completed a very basic prototype. Running the starting position to depth of 7 takes about 6 mins this is painfully slow. The program plays against itself stumbles on mates and just does everything fine-ish. As you would expect at this stage in the project. I've decided not to let this project die. However, with me at university I won't visit it as often until the end of the semester. My task now is just every now and then read over the code tweak and apply consistent naming conventions and work to sort of building clear view of how the code works, limitations and next steps. So prepare ready for a proper optimisation whenever I'm ready for it.
 
+20/06/26
 
+I had written an entry before this one but it ended up getting lost somewhere when I was making the switch from windows to linux. It has been quite difficult, the kernel has died on me twice now and I have had to reinstall the whole OS again. Anyways, I have completed some benchmarking so I can have something to compare to when I improve it. The main issues right now seem to be the memeory allocations. I heavily use vectors just as part of the early stages of devlopment but these are coming back to haunt me. A more compact way would be to get rid of all hepa allocations switch to fixed size arrays; changing the move struct to some kind of 16 or 32 bit integer and updating that. I also need to embrace the idea of incrementally changing the bitboards and doign more logic on that. There was a reason I did not do that but I cant remember. I think i just need to get ym hands dirty and program again. Its been a year since I have programmed in C++ but I have high hopes.
+
+Target moves.cpp -----> Get rid of vectors ------> Refactor move struct ------> Benchamrk --------> Modify make and unmake in detail -------> Benchamrk ------> Break up file into smaller more testable independant units.
+
+The last part is quite important. The file right now is too big at 900+ lines. However, it cannot be rushed. In my opinion the optimisations must happen first before the file is broken up into samller more compact units. From what I have seen so far the code is written to a standard. I have grown as a programmer over the past year so obvioulsy there are improvments to be made but not as bad as I once thought.
+
+27/06/26
+
+Carried out major refactoring work. Got rid of mostly all dynamic allocations, still some left but it will be gone soon. Brought the running time from 236s startpos to depth 7 down to 114s. Fairly happy with that. There is still alot more room I feel to optimise it, maybe reach sub 2.5mins. Overall has been great. Nodes per second (nps) improved from 13.6m to 26.2m, almost double. Linux has been great in its profiling tools great switch. The terminal tools are also great make building and modifying code fell part of the system not an abstracted away after thought. Lets see how far I cna get it down. Although Ill give myself a week before I move on to the actual search. 
 
 
 

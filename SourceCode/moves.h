@@ -14,9 +14,16 @@ struct Move {
     bool castle = false;
 };
 
+struct MoveList {
+    Move moves[256];
+    int count = 0;
+};
 
 // Function to generate all legal moves
-std::vector<Move> legal_move_gen(full_pos &state);
+MoveList legal_move_gen(full_pos &state);
+
+// Function to generate psuedo legal moves
+MoveList psuedo_moves(const full_pos& gamestate);
 
 // Apply a move onto the board and accurately update state
 void make_move(full_pos& state, Move& move);
